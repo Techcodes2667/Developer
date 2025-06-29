@@ -88,5 +88,5 @@ def community(request):
 
 @require_http_methods(["GET"])
 def health_check(request):
-    """Health check endpoint for monitoring"""
+    """Health check Endpoint for monitoring"""
     return JsonResponse({'status': 'healthy', 'service': 'telehealth_diabetes'})
