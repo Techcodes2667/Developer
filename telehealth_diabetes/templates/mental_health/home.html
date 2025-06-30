@@ -1,0 +1,397 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mental Health Support - Telehealth Diabetes Care{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Hero Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="bg-gradient-success text-white rounded-3 p-5 text-center">
+                <h1 class="display-4 fw-bold mb-3">
+                    <i class="fas fa-heart me-3"></i>
+                    Mental Health & Wellness
+                </h1>
+                <p class="lead mb-4">
+                    Supporting your emotional well-being on your diabetes journey
+                </p>
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'mental_health:dashboard' %}" class="btn btn-light btn-lg">
+                            <i class="fas fa-chart-line me-2"></i>My Wellness Dashboard
+                        </a>
+                        <a href="{% url 'mental_health:mood_tracking' %}" class="btn btn-outline-light btn-lg">
+                            <i class="fas fa-smile me-2"></i>Track Mood
+                        </a>
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}" class="btn btn-light btn-lg">
+                            <i class="fas fa-sign-in-alt me-2"></i>Login to Track Wellness
+                        </a>
+                    {% endif %}
+                    <a href="{% url 'mental_health:crisis_resources' %}" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-phone me-2"></i>Crisis Support
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Mood Check -->
+    {% if user.is_authenticated %}
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-smile me-2 text-primary"></i>
+                            Quick Mood Check
+                        </h5>
+                        {% if recent_mood %}
+                            <small class="text-muted">
+                                Last recorded: {{ recent_mood.recorded_at|timesince }} ago
+                            </small>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">How are you feeling today? Quick mood tracking helps identify patterns.</p>
+                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+                        <button class="btn btn-outline-danger mood-btn" data-mood="1" title="Very Low">
+                            <i class="fas fa-frown fa-2x"></i><br>
+                            <small>Very Low</small>
+                        </button>
+                        <button class="btn btn-outline-warning mood-btn" data-mood="2" title="Low">
+                            <i class="fas fa-meh-rolling-eyes fa-2x"></i><br>
+                            <small>Low</small>
+                        </button>
+                        <button class="btn btn-outline-secondary mood-btn" data-mood="3" title="Neutral">
+                            <i class="fas fa-meh fa-2x"></i><br>
+                            <small>Neutral</small>
+                        </button>
+                        <button class="btn btn-outline-success mood-btn" data-mood="4" title="Good">
+                            <i class="fas fa-smile fa-2x"></i><br>
+                            <small>Good</small>
+                        </button>
+                        <button class="btn btn-outline-primary mood-btn" data-mood="5" title="Excellent">
+                            <i class="fas fa-grin-stars fa-2x"></i><br>
+                            <small>Excellent</small>
+                        </button>
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="{% url 'mental_health:mood_tracking' %}" class="btn btn-sm btn-outline-primary">
+                            Detailed Mood Tracking
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Mental Health Tools -->
+            <div class="row mb-5">
+                <div class="col-12">
+                    <h2 class="h3 text-primary mb-4">
+                        <i class="fas fa-tools me-2"></i>
+                        Mental Health Tools
+                    </h2>
+                </div>
+                
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 border-0 shadow-sm tool-card">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <i class="fas fa-chart-line fa-3x text-primary"></i>
+                            </div>
+                            <h5 class="card-title">Mood Tracking</h5>
+                            <p class="card-text text-muted">Monitor your daily mood, energy, and stress levels to identify patterns.</p>
+                            <a href="{% url 'mental_health:mood_tracking' %}" class="btn btn-primary">
+                                Start Tracking
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 border-0 shadow-sm tool-card">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <i class="fas fa-clipboard-check fa-3x text-success"></i>
+                            </div>
+                            <h5 class="card-title">Self-Assessments</h5>
+                            <p class="card-text text-muted">Take validated assessments to understand your mental health status.</p>
+                            <a href="{% url 'mental_health:assessments' %}" class="btn btn-success">
+                                Take Assessment
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 border-0 shadow-sm tool-card">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <i class="fas fa-leaf fa-3x text-info"></i>
+                            </div>
+                            <h5 class="card-title">Coping Strategies</h5>
+                            <p class="card-text text-muted">Learn effective techniques to manage stress and difficult emotions.</p>
+                            <a href="{% url 'mental_health:coping_strategies' %}" class="btn btn-info">
+                                Learn Strategies
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 border-0 shadow-sm tool-card">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <i class="fas fa-book-open fa-3x text-warning"></i>
+                            </div>
+                            <h5 class="card-title">Resources</h5>
+                            <p class="card-text text-muted">Access articles, guides, and educational materials on mental health.</p>
+                            <a href="{% url 'mental_health:resources' %}" class="btn btn-warning">
+                                Browse Resources
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Featured Resources -->
+            {% if resources %}
+            <div class="row mb-5">
+                <div class="col-12">
+                    <h2 class="h3 text-primary mb-4">
+                        <i class="fas fa-star me-2"></i>
+                        Featured Resources
+                    </h2>
+                </div>
+                {% for resource in resources %}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-primary">{{ resource.get_resource_type_display }}</span>
+                                <span class="badge bg-secondary">{{ resource.get_difficulty_level_display }}</span>
+                            </div>
+                            <h5 class="card-title">{{ resource.title }}</h5>
+                            <p class="card-text text-muted">{{ resource.summary|truncatewords:20 }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>
+                                    {% if resource.estimated_read_time %}
+                                        {{ resource.estimated_read_time }} min read
+                                    {% else %}
+                                        Quick read
+                                    {% endif %}
+                                </small>
+                                <a href="#" class="btn btn-primary btn-sm">
+                                    Read More
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Coping Strategies Preview -->
+            {% if strategies %}
+            <div class="row mb-5">
+                <div class="col-12">
+                    <h2 class="h3 text-primary mb-4">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        Quick Coping Strategies
+                    </h2>
+                </div>
+                {% for strategy in strategies %}
+                <div class="col-md-6 mb-3">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    {% if strategy.strategy_type == 'breathing' %}
+                                        <i class="fas fa-wind fa-2x text-primary"></i>
+                                    {% elif strategy.strategy_type == 'mindfulness' %}
+                                        <i class="fas fa-om fa-2x text-success"></i>
+                                    {% elif strategy.strategy_type == 'physical' %}
+                                        <i class="fas fa-running fa-2x text-warning"></i>
+                                    {% else %}
+                                        <i class="fas fa-brain fa-2x text-info"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">{{ strategy.title }}</h6>
+                                    <small class="text-muted">{{ strategy.get_strategy_type_display }}</small>
+                                </div>
+                                <div>
+                                    <button class="btn btn-sm btn-outline-primary" onclick="showStrategy('{{ strategy.id }}')">
+                                        Try It
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Crisis Support -->
+            <div class="card border-danger shadow-sm mb-4">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Need Immediate Help?
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-3">If you're having thoughts of self-harm or suicide, please reach out immediately:</p>
+                    <div class="d-grid gap-2">
+                        <a href="tel:0800720000" class="btn btn-danger">
+                            <i class="fas fa-phone me-2"></i>Call 0800 720 000
+                        </a>
+                        <a href="{% url 'mental_health:crisis_resources' %}" class="btn btn-outline-danger">
+                            <i class="fas fa-info-circle me-2"></i>More Crisis Resources
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mental Health Tips -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-heart me-2 text-success"></i>
+                        Daily Wellness Tips
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6 class="mb-1">Practice Gratitude</h6>
+                        <small class="text-muted">Write down 3 things you're grateful for each day</small>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="mb-1">Stay Connected</h6>
+                        <small class="text-muted">Reach out to friends, family, or support groups</small>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="mb-1">Move Your Body</h6>
+                        <small class="text-muted">Even 10 minutes of movement can boost your mood</small>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="mb-1">Mindful Breathing</h6>
+                        <small class="text-muted">Take 5 deep breaths when feeling overwhelmed</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-link me-2 text-info"></i>
+                        Quick Access
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        {% if user.is_authenticated %}
+                        <a href="{% url 'mental_health:dashboard' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-tachometer-alt me-2"></i>Wellness Dashboard
+                        </a>
+                        <a href="{% url 'mental_health:assessment_results' %}" class="btn btn-outline-success">
+                            <i class="fas fa-chart-bar me-2"></i>My Assessment Results
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'mental_health:assessments' %}" class="btn btn-outline-warning">
+                            <i class="fas fa-clipboard-check me-2"></i>Take Assessment
+                        </a>
+                        <a href="{% url 'mental_health:coping_strategies' %}" class="btn btn-outline-info">
+                            <i class="fas fa-leaf me-2"></i>Coping Strategies
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.bg-gradient-success {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+}
+
+.tool-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tool-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.mood-btn {
+    min-width: 80px;
+    padding: 15px 10px;
+    transition: all 0.3s ease;
+}
+
+.mood-btn:hover {
+    transform: scale(1.1);
+}
+</style>
+
+<script>
+// Quick mood check functionality
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.mood-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const mood = this.dataset.mood;
+            
+            fetch('{% url "mental_health:quick_mood_check" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: `mood_level=${mood}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Visual feedback
+                    this.classList.add('btn-success');
+                    this.innerHTML = '<i class="fas fa-check fa-2x"></i><br><small>Recorded!</small>';
+                    
+                    // Reset after 2 seconds
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000);
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                alert('Error recording mood');
+            });
+        });
+    });
+});
+
+function showStrategy(strategyId) {
+    // This would show a modal with the strategy details
+    alert('Strategy details would be shown here. Feature coming soon!');
+}
+</script>
+{% endblock %}

@@ -1,0 +1,344 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Education Hub - Telehealth Diabetes Care{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Hero Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="bg-gradient-primary text-white rounded-3 p-5 text-center">
+                <h1 class="display-4 fw-bold mb-3">
+                    <i class="fas fa-graduation-cap me-3"></i>
+                    Diabetes Education Hub
+                </h1>
+                <p class="lead mb-4">
+                    Comprehensive learning resources to help you manage diabetes effectively
+                </p>
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    <a href="{% url 'education:library' %}" class="btn btn-light btn-lg">
+                        <i class="fas fa-book me-2"></i>Browse Library
+                    </a>
+                    <a href="{% url 'education:search' %}" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-search me-2"></i>Search Content
+                    </a>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'education:my_progress' %}" class="btn btn-outline-light btn-lg">
+                            <i class="fas fa-chart-line me-2"></i>My Progress
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    {% if user.is_authenticated and user_progress %}
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user-graduate me-2 text-success"></i>
+                        Your Learning Journey
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for progress in user_progress %}
+                        <div class="col-md-4 mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <div class="progress-circle" data-progress="{{ progress.progress_percentage }}">
+                                        <span>{{ progress.progress_percentage }}%</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">{{ progress.content.title|truncatewords:4 }}</h6>
+                                    <small class="text-muted">{{ progress.progress_percentage }}% complete</small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="{% url 'education:my_progress' %}" class="btn btn-outline-success">
+                            View All Progress
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Categories -->
+            <div class="row mb-5">
+                <div class="col-12">
+                    <h2 class="h3 text-primary mb-4">
+                        <i class="fas fa-th-large me-2"></i>
+                        Learning Categories
+                    </h2>
+                </div>
+                {% for category in categories %}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 border-0 shadow-sm category-card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="me-3">
+                                    {% if category.icon %}
+                                        <i class="{{ category.icon }} fa-2x text-primary"></i>
+                                    {% else %}
+                                        <i class="fas fa-book-medical fa-2x text-primary"></i>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <h5 class="card-title mb-1">{{ category.name }}</h5>
+                                    <small class="text-muted">{{ category.content_count }} articles</small>
+                                </div>
+                            </div>
+                            <p class="card-text text-muted">{{ category.description|truncatewords:15 }}</p>
+                            <a href="{% url 'education:category' category.id %}" class="btn btn-outline-primary btn-sm">
+                                Explore <i class="fas fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Featured Content -->
+            {% if featured_content %}
+            <div class="row mb-5">
+                <div class="col-12">
+                    <h2 class="h3 text-primary mb-4">
+                        <i class="fas fa-star me-2"></i>
+                        Featured Content
+                    </h2>
+                </div>
+                {% for content in featured_content %}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        {% if content.image %}
+                        <img src="{{ content.image.url }}" class="card-img-top" alt="{{ content.title }}" style="height: 200px; object-fit: cover;">
+                        {% else %}
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                            <i class="fas fa-file-alt fa-3x text-muted"></i>
+                        </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-primary">{{ content.get_content_type_display }}</span>
+                                <span class="badge bg-secondary">{{ content.get_difficulty_level_display }}</span>
+                            </div>
+                            <h5 class="card-title">{{ content.title }}</h5>
+                            <p class="card-text text-muted">{{ content.summary|truncatewords:20 }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>
+                                    {% if content.estimated_read_time %}
+                                        {{ content.estimated_read_time }} min read
+                                    {% else %}
+                                        Quick read
+                                    {% endif %}
+                                </small>
+                                <a href="{% url 'education:content_detail' content.slug %}" class="btn btn-primary btn-sm">
+                                    Read More
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Recent Content -->
+            {% if recent_content %}
+            <div class="row mb-5">
+                <div class="col-12">
+                    <h2 class="h3 text-primary mb-4">
+                        <i class="fas fa-clock me-2"></i>
+                        Recently Added
+                    </h2>
+                </div>
+                {% for content in recent_content %}
+                <div class="col-md-6 mb-3">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    {% if content.content_type == 'video' %}
+                                        <i class="fas fa-play-circle fa-2x text-danger"></i>
+                                    {% elif content.content_type == 'quiz' %}
+                                        <i class="fas fa-question-circle fa-2x text-warning"></i>
+                                    {% else %}
+                                        <i class="fas fa-file-alt fa-2x text-info"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">{{ content.title|truncatewords:6 }}</h6>
+                                    <small class="text-muted">{{ content.created_at|timesince }} ago</small>
+                                </div>
+                                <div>
+                                    <a href="{% url 'education:content_detail' content.slug %}" class="btn btn-sm btn-outline-primary">
+                                        View
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Search -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-search me-2 text-info"></i>
+                        Quick Search
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" action="{% url 'education:search' %}">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="q" placeholder="Search articles, recipes, exercises...">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Popular Content -->
+            {% if popular_content %}
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-fire me-2 text-danger"></i>
+                        Popular Content
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% for content in popular_content %}
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="me-3">
+                            <span class="badge bg-danger">{{ forloop.counter }}</span>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1">
+                                <a href="{% url 'education:content_detail' content.slug %}" class="text-decoration-none">
+                                    {{ content.title|truncatewords:5 }}
+                                </a>
+                            </h6>
+                            <small class="text-muted">{{ content.view_count }} views</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Quick Links -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-link me-2 text-success"></i>
+                        Quick Access
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'education:recipes' %}" class="btn btn-outline-success">
+                            <i class="fas fa-utensils me-2"></i>Healthy Recipes
+                        </a>
+                        <a href="{% url 'education:exercises' %}" class="btn btn-outline-info">
+                            <i class="fas fa-dumbbell me-2"></i>Exercise Routines
+                        </a>
+                        <a href="{% url 'main:diabetes_info_hub' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-info-circle me-2"></i>Diabetes Basics
+                        </a>
+                        {% if user.is_authenticated %}
+                        <a href="{% url 'education:my_progress' %}" class="btn btn-outline-warning">
+                            <i class="fas fa-chart-line me-2"></i>My Progress
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Learning Tips -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-lightbulb me-2 text-warning"></i>
+                        Learning Tips
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6 class="mb-1">Start with Basics</h6>
+                        <small class="text-muted">Begin with beginner-level content if you're newly diagnosed</small>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="mb-1">Track Your Progress</h6>
+                        <small class="text-muted">Mark content as complete to track your learning journey</small>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="mb-1">Apply What You Learn</h6>
+                        <small class="text-muted">Try implementing tips in your daily diabetes management</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #0d6efd 0%, #0056b3 100%);
+}
+
+.category-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.progress-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: conic-gradient(#28a745 0deg, #28a745 calc(var(--progress) * 3.6deg), #e9ecef calc(var(--progress) * 3.6deg));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    color: #28a745;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Set progress circle values
+    document.querySelectorAll('.progress-circle').forEach(circle => {
+        const progress = circle.dataset.progress;
+        circle.style.setProperty('--progress', progress);
+    });
+});
+</script>
+{% endblock %}

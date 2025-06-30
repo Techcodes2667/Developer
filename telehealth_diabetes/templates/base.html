@@ -35,29 +35,46 @@
                             <i class="fas fa-home me-1"></i>Home
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'main:about' %}">
+                            <i class="fas fa-info-circle me-1"></i>About
+                        </a>
+                    </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-book-medical me-1"></i>Education
+                            <i class="fas fa-stethoscope me-1"></i>Telehealth
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{% url 'education:about_diabetes' %}">About Diabetes</a></li>
-                            <li><a class="dropdown-item" href="{% url 'education:living_with_diabetes' %}">Living with Diabetes</a></li>
-                            <li><a class="dropdown-item" href="{% url 'education:self_management' %}">Self-Management</a></li>
+                            <li><a class="dropdown-item" href="{% url 'main:how_telehealth_works' %}">How It Works</a></li>
+                            <li><a class="dropdown-item" href="{% url 'appointments:schedule' %}">Schedule Appointment</a></li>
+                            <li><a class="dropdown-item" href="{% url 'patients:monitoring' %}">Remote Monitoring</a></li>
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-video me-1"></i>Telehealth Services
+                            <i class="fas fa-book-medical me-1"></i>Diabetes Info
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{% url 'appointments:schedule' %}">Schedule Appointment</a></li>
-                            <li><a class="dropdown-item" href="{% url 'patients:monitoring' %}">Remote Monitoring</a></li>
-                            <li><a class="dropdown-item" href="{% url 'patients:portal' %}">Patient Portal</a></li>
+                            <li><a class="dropdown-item" href="{% url 'main:diabetes_info_hub' %}">Diabetes Info Hub</a></li>
+                            <li><a class="dropdown-item" href="{% url 'main:tele_education_overview' %}">Tele-Education</a></li>
+                            <li><a class="dropdown-item" href="{% url 'education:home' %}">Education Library</a></li>
+                            <li><a class="dropdown-item" href="{% url 'education:recipes' %}">Recipes</a></li>
+                            <li><a class="dropdown-item" href="{% url 'education:exercises' %}">Exercise Routines</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-users me-1"></i>Community
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'support_groups:list' %}">Support Groups</a></li>
+                            <li><a class="dropdown-item" href="{% url 'support_groups:qa_sessions' %}">Live Q&A</a></li>
+                            <li><a class="dropdown-item" href="{% url 'mental_health:home' %}">Mental Health</a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'main:community' %}">
-                            <i class="fas fa-users me-1"></i>Community
+                        <a class="nav-link" href="{% url 'main:blog' %}">
+                            <i class="fas fa-newspaper me-1"></i>News
                         </a>
                     </li>
                 </ul>
@@ -69,10 +86,15 @@
                                 <i class="fas fa-user me-1"></i>{{ user.username }}
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{% url 'patients:profile' %}">Profile</a></li>
-                                <li><a class="dropdown-item" href="{% url 'patients:dashboard' %}">Dashboard</a></li>
+                                <li><a class="dropdown-item" href="{% url 'patients:dashboard' %}"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
+                                <li><a class="dropdown-item" href="{% url 'patients:profile' %}"><i class="fas fa-user-edit me-2"></i>My Profile</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{% url 'main:logout' %}">Logout</a></li>
+                                <li><a class="dropdown-item" href="{% url 'health_data:home' %}"><i class="fas fa-chart-line me-2"></i>Health Data</a></li>
+                                <li><a class="dropdown-item" href="{% url 'medication_management:list' %}"><i class="fas fa-pills me-2"></i>Medications</a></li>
+                                <li><a class="dropdown-item" href="{% url 'appointments:list' %}"><i class="fas fa-calendar-alt me-2"></i>Appointments</a></li>
+                                <li><a class="dropdown-item" href="{% url 'goals:list' %}"><i class="fas fa-bullseye me-2"></i>My Goals</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'main:logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
                             </ul>
                         </li>
                     {% else %}
@@ -114,23 +136,33 @@
     <footer class="bg-dark text-light mt-5 py-4">
         <div class="container">
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <h5><i class="fas fa-heartbeat me-2"></i>DiabetesCare</h5>
-                    <p>Empowering diabetes patients through innovative telehealth solutions.</p>
+                    <p>Empowering diabetes management from Kisumu – anywhere, anytime.</p>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <h5>Quick Links</h5>
                     <ul class="list-unstyled">
                         <li><a href="{% url 'main:about' %}" class="text-light">About Us</a></li>
-                        <li><a href="{% url 'main:contact' %}" class="text-light">Contact</a></li>
-                        <li><a href="{% url 'main:privacy' %}" class="text-light">Privacy Policy</a></li>
-                        <li><a href="{% url 'main:terms' %}" class="text-light">Terms of Service</a></li>
+                        <li><a href="{% url 'main:how_telehealth_works' %}" class="text-light">How Telehealth Works</a></li>
+                        <li><a href="{% url 'main:diabetes_info_hub' %}" class="text-light">Diabetes Info</a></li>
+                        <li><a href="{% url 'main:faq' %}" class="text-light">FAQ</a></li>
                     </ul>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
+                    <h5>Legal & Security</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{% url 'main:privacy' %}" class="text-light">Privacy Policy</a></li>
+                        <li><a href="{% url 'main:terms' %}" class="text-light">Terms of Service</a></li>
+                        <li><a href="{% url 'main:security_tips' %}" class="text-light">Security Tips</a></li>
+                        <li><a href="{% url 'main:contact' %}" class="text-light">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
                     <h5>Contact Info</h5>
-                    <p><i class="fas fa-phone me-2"></i>+1 (555) 123-4567</p>
-                    <p><i class="fas fa-envelope me-2"></i>support@diabetescare.com</p>
+                    <p><i class="fas fa-phone me-2"></i>+254 (0) 123-456-789</p>
+                    <p><i class="fas fa-envelope me-2"></i>support@diabetescare.co.ke</p>
+                    <p><i class="fas fa-map-marker-alt me-2"></i>Kisumu, Kenya</p>
                     <p><i class="fas fa-clock me-2"></i>24/7 Support Available</p>
                 </div>
             </div>

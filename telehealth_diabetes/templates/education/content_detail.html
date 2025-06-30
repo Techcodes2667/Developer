@@ -1,0 +1,456 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ content.title }} - Education Library{% endblock %}
+
+{% block extra_css %}
+<style>
+.content-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 15px;
+    padding: 3rem 2rem;
+    margin-bottom: 2rem;
+}
+
+.content-meta {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.content-body {
+    font-size: 1.1rem;
+    line-height: 1.8;
+}
+
+.content-body h2, .content-body h3, .content-body h4 {
+    color: #495057;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+.content-body p {
+    margin-bottom: 1.5rem;
+}
+
+.content-body ul, .content-body ol {
+    margin-bottom: 1.5rem;
+    padding-left: 2rem;
+}
+
+.content-body li {
+    margin-bottom: 0.5rem;
+}
+
+.content-image {
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 2rem 0;
+}
+
+.related-content {
+    background: #f8f9fa;
+    border-radius: 15px;
+    padding: 2rem;
+}
+
+.related-item {
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background: white;
+    transition: transform 0.2s ease;
+}
+
+.related-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.progress-tracker {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.content-actions {
+    position: sticky;
+    top: 20px;
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.difficulty-badge {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+}
+
+.content-type-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: white;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'education:home' %}">Education</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'education:library' %}">Library</a></li>
+            {% if content.category %}
+                <li class="breadcrumb-item">
+                    <a href="{% url 'education:category' content.category.id %}">{{ content.category.name }}</a>
+                </li>
+            {% endif %}
+            <li class="breadcrumb-item active" aria-current="page">{{ content.title|truncatewords:5 }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Content Header -->
+            <div class="content-header">
+                <div class="d-flex align-items-start">
+                    <div class="content-type-icon 
+                        {% if content.content_type == 'article' %}bg-primary
+                        {% elif content.content_type == 'video' %}bg-danger
+                        {% elif content.content_type == 'quiz' %}bg-success
+                        {% elif content.content_type == 'recipe' %}bg-warning
+                        {% else %}bg-info{% endif %} me-3">
+                        {% if content.content_type == 'article' %}<i class="fas fa-file-alt"></i>
+                        {% elif content.content_type == 'video' %}<i class="fas fa-play"></i>
+                        {% elif content.content_type == 'quiz' %}<i class="fas fa-question-circle"></i>
+                        {% elif content.content_type == 'recipe' %}<i class="fas fa-utensils"></i>
+                        {% else %}<i class="fas fa-info-circle"></i>{% endif %}
+                    </div>
+                    <div class="flex-grow-1">
+                        <h1 class="display-6 fw-bold mb-2">{{ content.title }}</h1>
+                        <p class="lead mb-3">{{ content.summary }}</p>
+                        <div class="d-flex flex-wrap align-items-center gap-3">
+                            <span class="difficulty-badge 
+                                {% if content.difficulty_level == 'beginner' %}bg-success text-white
+                                {% elif content.difficulty_level == 'intermediate' %}bg-warning text-dark
+                                {% else %}bg-danger text-white{% endif %}">
+                                {{ content.get_difficulty_level_display }}
+                            </span>
+                            {% if content.estimated_read_time %}
+                                <span class="badge bg-light text-dark">
+                                    <i class="fas fa-clock me-1"></i>{{ content.estimated_read_time }} min read
+                                </span>
+                            {% endif %}
+                            <span class="badge bg-light text-dark">
+                                <i class="fas fa-eye me-1"></i>{{ content.view_count }} views
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Tracker -->
+            {% if user.is_authenticated %}
+                <div class="progress-tracker">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-1">
+                                <i class="fas fa-chart-line me-2"></i>
+                                Learning Progress
+                            </h5>
+                            <p class="mb-0">Track your educational journey</p>
+                        </div>
+                        <button class="btn btn-light" onclick="markAsRead()">
+                            <i class="fas fa-check me-2"></i>Mark as Read
+                        </button>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Content Meta -->
+            <div class="content-meta">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="fw-bold mb-2">Content Details</h6>
+                        <ul class="list-unstyled mb-0">
+                            <li><strong>Category:</strong> {{ content.category.name|default:"General" }}</li>
+                            <li><strong>Type:</strong> {{ content.get_content_type_display }}</li>
+                            <li><strong>Level:</strong> {{ content.get_difficulty_level_display }}</li>
+                            {% if content.estimated_read_time %}
+                                <li><strong>Reading Time:</strong> {{ content.estimated_read_time }} minutes</li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="fw-bold mb-2">Published</h6>
+                        <ul class="list-unstyled mb-0">
+                            <li><strong>Date:</strong> {{ content.created_at|date:"F d, Y" }}</li>
+                            <li><strong>Last Updated:</strong> {{ content.updated_at|date:"F d, Y" }}</li>
+                            <li><strong>Views:</strong> {{ content.view_count }}</li>
+                            {% if content.author %}
+                                <li><strong>Author:</strong> {{ content.author }}</li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Featured Image -->
+            {% if content.image %}
+                <img src="{{ content.image.url }}" class="img-fluid content-image w-100" alt="{{ content.title }}">
+            {% endif %}
+
+            <!-- Main Content Body -->
+            <div class="content-body">
+                {{ content.content|safe }}
+            </div>
+
+            <!-- Video Content -->
+            {% if content.content_type == 'video' and content.video_url %}
+                <div class="ratio ratio-16x9 my-4">
+                    <iframe src="{{ content.video_url }}" title="{{ content.title }}" allowfullscreen></iframe>
+                </div>
+            {% endif %}
+
+            <!-- Tags -->
+            {% if content.tags.all %}
+                <div class="mt-4">
+                    <h6 class="fw-bold mb-2">Tags:</h6>
+                    {% for tag in content.tags.all %}
+                        <span class="badge bg-secondary me-1 mb-1">{{ tag.name }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Navigation -->
+            <div class="d-flex justify-content-between mt-5">
+                <a href="{% url 'education:library' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Library
+                </a>
+                {% if user.is_authenticated %}
+                    <div class="btn-group">
+                        <button class="btn btn-success" onclick="markAsRead()">
+                            <i class="fas fa-check me-2"></i>Mark as Read
+                        </button>
+                        <button class="btn btn-outline-warning bookmark-btn" data-content-id="{{ content.id }}">
+                            <i class="fas fa-bookmark me-2"></i>Bookmark
+                        </button>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Content Actions -->
+            <div class="content-actions">
+                <h5 class="fw-bold mb-3">
+                    <i class="fas fa-tools me-2"></i>
+                    Quick Actions
+                </h5>
+                
+                {% if user.is_authenticated %}
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-primary" onclick="markAsRead()">
+                            <i class="fas fa-check me-2"></i>Mark as Read
+                        </button>
+                        <button class="btn btn-outline-warning bookmark-btn" data-content-id="{{ content.id }}">
+                            <i class="fas fa-bookmark me-2"></i>Bookmark
+                        </button>
+                        <a href="{% url 'education:my_progress' %}" class="btn btn-outline-info">
+                            <i class="fas fa-chart-line me-2"></i>View Progress
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="text-center">
+                        <p class="text-muted mb-3">Login to track your progress and bookmark content</p>
+                        <a href="{% url 'accounts:login' %}" class="btn btn-primary">
+                            <i class="fas fa-sign-in-alt me-2"></i>Login
+                        </a>
+                    </div>
+                {% endif %}
+                
+                <hr>
+                
+                <h6 class="fw-bold mb-2">Share This Content</h6>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-primary btn-sm" onclick="shareContent('facebook')">
+                        <i class="fab fa-facebook-f"></i>
+                    </button>
+                    <button class="btn btn-outline-info btn-sm" onclick="shareContent('twitter')">
+                        <i class="fab fa-twitter"></i>
+                    </button>
+                    <button class="btn btn-outline-success btn-sm" onclick="shareContent('whatsapp')">
+                        <i class="fab fa-whatsapp"></i>
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="copyLink()">
+                        <i class="fas fa-link"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Related Content -->
+            {% if related_content %}
+                <div class="related-content mt-4">
+                    <h5 class="fw-bold mb-3">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        Related Content
+                    </h5>
+                    {% for item in related_content %}
+                        <div class="related-item">
+                            <h6 class="mb-1">
+                                <a href="{% url 'education:content_detail' item.slug %}" class="text-decoration-none">
+                                    {{ item.title }}
+                                </a>
+                            </h6>
+                            <p class="text-muted small mb-2">{{ item.summary|truncatewords:15 }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge bg-primary">{{ item.get_content_type_display }}</span>
+                                {% if item.estimated_read_time %}
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock me-1"></i>{{ item.estimated_read_time }} min
+                                    </small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Category Content -->
+            {% if content.category %}
+                <div class="mt-4">
+                    <div class="card border-primary">
+                        <div class="card-body text-center">
+                            <h6 class="card-title">
+                                <i class="fas fa-folder me-2"></i>
+                                More in {{ content.category.name }}
+                            </h6>
+                            <p class="card-text small">
+                                Explore more content in this category
+                            </p>
+                            <a href="{% url 'education:category' content.category.id %}" class="btn btn-primary btn-sm">
+                                View Category
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Bookmark functionality
+    const bookmarkBtn = document.querySelector('.bookmark-btn');
+    if (bookmarkBtn) {
+        bookmarkBtn.addEventListener('click', function() {
+            const contentId = this.dataset.contentId;
+            
+            fetch(`{% url 'education:bookmark' 0 %}`.replace('0', contentId), {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    this.classList.add('btn-warning');
+                    this.classList.remove('btn-outline-warning');
+                    showAlert('Content bookmarked successfully!', 'success');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('Error bookmarking content', 'danger');
+            });
+        });
+    }
+});
+
+function markAsRead() {
+    // Implementation for marking content as read
+    fetch(`{% url 'education:content_detail' content.slug %}`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ action: 'mark_read' })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showAlert('Content marked as read!', 'success');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+function shareContent(platform) {
+    const url = window.location.href;
+    const title = "{{ content.title|escapejs }}";
+    
+    let shareUrl = '';
+    switch(platform) {
+        case 'facebook':
+            shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+            break;
+        case 'twitter':
+            shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`;
+            break;
+        case 'whatsapp':
+            shareUrl = `https://wa.me/?text=${encodeURIComponent(title + ' ' + url)}`;
+            break;
+    }
+    
+    if (shareUrl) {
+        window.open(shareUrl, '_blank', 'width=600,height=400');
+    }
+}
+
+function copyLink() {
+    navigator.clipboard.writeText(window.location.href).then(function() {
+        showAlert('Link copied to clipboard!', 'success');
+    });
+}
+
+function showAlert(message, type) {
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+    alert.style.top = '20px';
+    alert.style.right = '20px';
+    alert.style.zIndex = '9999';
+    alert.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.body.appendChild(alert);
+    
+    setTimeout(() => {
+        alert.remove();
+    }, 3000);
+}
+</script>
+{% endblock %}

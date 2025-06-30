@@ -1,0 +1,489 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Search Education Content - Telehealth Diabetes Care{% endblock %}
+
+{% block extra_css %}
+<style>
+.search-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 15px;
+    padding: 3rem 2rem;
+    margin-bottom: 2rem;
+}
+
+.search-form {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 2rem;
+    backdrop-filter: blur(10px);
+}
+
+.search-filters {
+    background: #f8f9fa;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.filter-chip {
+    display: inline-block;
+    background: #e9ecef;
+    color: #495057;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    margin: 0.25rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.filter-chip:hover, .filter-chip.active {
+    background: #007bff;
+    color: white;
+    border-color: #0056b3;
+}
+
+.search-result {
+    border: 1px solid #dee2e6;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    background: white;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.search-result:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.search-stats {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.content-type-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 15px;
+}
+
+.highlight {
+    background-color: #fff3cd;
+    padding: 0.1rem 0.2rem;
+    border-radius: 3px;
+}
+
+.search-suggestions {
+    background: #e3f2fd;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.no-results {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #6c757d;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Search Header -->
+    <div class="search-header">
+        <div class="text-center mb-4">
+            <h1 class="display-5 fw-bold mb-2">
+                <i class="fas fa-search me-3"></i>
+                Search Education Content
+            </h1>
+            <p class="lead">Find diabetes education resources, articles, videos, and more</p>
+        </div>
+        
+        <!-- Search Form -->
+        <div class="search-form">
+            <form method="get" class="row g-3">
+                <div class="col-lg-8">
+                    <div class="input-group input-group-lg">
+                        <span class="input-group-text bg-white border-0">
+                            <i class="fas fa-search text-muted"></i>
+                        </span>
+                        <input type="text" class="form-control border-0" name="q" 
+                               value="{{ query }}" placeholder="Search for articles, videos, recipes..."
+                               autofocus>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <button type="submit" class="btn btn-light btn-lg w-100">
+                        <i class="fas fa-search me-2"></i>Search
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Search Results Stats -->
+    {% if query %}
+        <div class="search-stats">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h4 class="mb-1">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        Search Results
+                    </h4>
+                    <p class="mb-0">
+                        Found {{ results.paginator.count }} result{{ results.paginator.count|pluralize }} 
+                        for "<strong>{{ query }}</strong>"
+                        {% if selected_filters %} with applied filters{% endif %}
+                    </p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <div class="d-flex flex-wrap justify-content-md-end gap-2">
+                        <span class="badge bg-light text-dark">
+                            <i class="fas fa-file-alt me-1"></i>
+                            {{ article_count }} Articles
+                        </span>
+                        <span class="badge bg-light text-dark">
+                            <i class="fas fa-play me-1"></i>
+                            {{ video_count }} Videos
+                        </span>
+                        <span class="badge bg-light text-dark">
+                            <i class="fas fa-utensils me-1"></i>
+                            {{ recipe_count }} Recipes
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Search Filters -->
+    {% if query or selected_filters %}
+        <div class="search-filters">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6 class="fw-bold mb-2">Filter by Type:</h6>
+                    <div class="d-flex flex-wrap">
+                        <a href="?q={{ query }}" class="filter-chip {% if not content_type %}active{% endif %}">
+                            All Types
+                        </a>
+                        <a href="?q={{ query }}&type=article" class="filter-chip {% if content_type == 'article' %}active{% endif %}">
+                            <i class="fas fa-file-alt me-1"></i>Articles
+                        </a>
+                        <a href="?q={{ query }}&type=video" class="filter-chip {% if content_type == 'video' %}active{% endif %}">
+                            <i class="fas fa-play me-1"></i>Videos
+                        </a>
+                        <a href="?q={{ query }}&type=recipe" class="filter-chip {% if content_type == 'recipe' %}active{% endif %}">
+                            <i class="fas fa-utensils me-1"></i>Recipes
+                        </a>
+                        <a href="?q={{ query }}&type=quiz" class="filter-chip {% if content_type == 'quiz' %}active{% endif %}">
+                            <i class="fas fa-question-circle me-1"></i>Quizzes
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="fw-bold mb-2">Filter by Difficulty:</h6>
+                    <div class="d-flex flex-wrap">
+                        <a href="?q={{ query }}{% if content_type %}&type={{ content_type }}{% endif %}" 
+                           class="filter-chip {% if not difficulty %}active{% endif %}">
+                            All Levels
+                        </a>
+                        <a href="?q={{ query }}{% if content_type %}&type={{ content_type }}{% endif %}&difficulty=beginner" 
+                           class="filter-chip {% if difficulty == 'beginner' %}active{% endif %}">
+                            Beginner
+                        </a>
+                        <a href="?q={{ query }}{% if content_type %}&type={{ content_type }}{% endif %}&difficulty=intermediate" 
+                           class="filter-chip {% if difficulty == 'intermediate' %}active{% endif %}">
+                            Intermediate
+                        </a>
+                        <a href="?q={{ query }}{% if content_type %}&type={{ content_type }}{% endif %}&difficulty=advanced" 
+                           class="filter-chip {% if difficulty == 'advanced' %}active{% endif %}">
+                            Advanced
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            {% if selected_filters %}
+                <div class="mt-3">
+                    <a href="?q={{ query }}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-times me-1"></i>Clear Filters
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <!-- Search Suggestions -->
+    {% if not query %}
+        <div class="search-suggestions">
+            <h6 class="fw-bold mb-2">
+                <i class="fas fa-lightbulb me-2"></i>
+                Popular Search Terms:
+            </h6>
+            <div class="d-flex flex-wrap gap-2">
+                <a href="?q=blood sugar" class="badge bg-primary text-decoration-none">blood sugar</a>
+                <a href="?q=insulin" class="badge bg-primary text-decoration-none">insulin</a>
+                <a href="?q=diet" class="badge bg-primary text-decoration-none">diet</a>
+                <a href="?q=exercise" class="badge bg-primary text-decoration-none">exercise</a>
+                <a href="?q=medication" class="badge bg-primary text-decoration-none">medication</a>
+                <a href="?q=complications" class="badge bg-primary text-decoration-none">complications</a>
+                <a href="?q=monitoring" class="badge bg-primary text-decoration-none">monitoring</a>
+                <a href="?q=lifestyle" class="badge bg-primary text-decoration-none">lifestyle</a>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Search Results -->
+    {% if query %}
+        {% if results %}
+            <div class="row">
+                {% for item in results %}
+                    <div class="col-12">
+                        <div class="search-result">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="d-flex align-items-start mb-2">
+                                        <span class="content-type-badge me-2
+                                            {% if item.content_type == 'article' %}bg-primary text-white
+                                            {% elif item.content_type == 'video' %}bg-danger text-white
+                                            {% elif item.content_type == 'quiz' %}bg-success text-white
+                                            {% elif item.content_type == 'recipe' %}bg-warning text-dark
+                                            {% else %}bg-info text-white{% endif %}">
+                                            {% if item.content_type == 'article' %}<i class="fas fa-file-alt me-1"></i>
+                                            {% elif item.content_type == 'video' %}<i class="fas fa-play me-1"></i>
+                                            {% elif item.content_type == 'quiz' %}<i class="fas fa-question-circle me-1"></i>
+                                            {% elif item.content_type == 'recipe' %}<i class="fas fa-utensils me-1"></i>
+                                            {% else %}<i class="fas fa-info-circle me-1"></i>{% endif %}
+                                            {{ item.get_content_type_display }}
+                                        </span>
+                                        <span class="badge bg-secondary">{{ item.get_difficulty_level_display }}</span>
+                                    </div>
+                                    
+                                    <h5 class="mb-2">
+                                        <a href="{% url 'education:content_detail' item.slug %}" class="text-decoration-none">
+                                            {{ item.title|safe }}
+                                        </a>
+                                    </h5>
+                                    
+                                    <p class="text-muted mb-2">{{ item.summary|safe|truncatewords:30 }}</p>
+                                    
+                                    <div class="d-flex align-items-center text-muted small">
+                                        {% if item.category %}
+                                            <span class="me-3">
+                                                <i class="fas fa-folder me-1"></i>{{ item.category.name }}
+                                            </span>
+                                        {% endif %}
+                                        {% if item.estimated_read_time %}
+                                            <span class="me-3">
+                                                <i class="fas fa-clock me-1"></i>{{ item.estimated_read_time }} min read
+                                            </span>
+                                        {% endif %}
+                                        <span class="me-3">
+                                            <i class="fas fa-eye me-1"></i>{{ item.view_count }} views
+                                        </span>
+                                        <span>
+                                            <i class="fas fa-calendar me-1"></i>{{ item.created_at|date:"M d, Y" }}
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4 text-md-end">
+                                    {% if item.image %}
+                                        <img src="{{ item.image.url }}" class="img-fluid rounded" 
+                                             style="max-height: 100px; object-fit: cover;" alt="{{ item.title }}">
+                                    {% else %}
+                                        <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                                             style="height: 100px; width: 100%;">
+                                            <i class="fas fa-image fa-2x text-muted"></i>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <div class="mt-2">
+                                        <a href="{% url 'education:content_detail' item.slug %}" 
+                                           class="btn btn-primary btn-sm">
+                                            <i class="fas fa-arrow-right me-1"></i>Read More
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if results.has_other_pages %}
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <nav aria-label="Search results pagination">
+                            <ul class="pagination justify-content-center">
+                                {% if results.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?q={{ query }}&page=1{% if content_type %}&type={{ content_type }}{% endif %}{% if difficulty %}&difficulty={{ difficulty }}{% endif %}">
+                                            <i class="fas fa-angle-double-left"></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?q={{ query }}&page={{ results.previous_page_number }}{% if content_type %}&type={{ content_type }}{% endif %}{% if difficulty %}&difficulty={{ difficulty }}{% endif %}">
+                                            <i class="fas fa-angle-left"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                
+                                <li class="page-item active">
+                                    <span class="page-link">
+                                        Page {{ results.number }} of {{ results.paginator.num_pages }}
+                                    </span>
+                                </li>
+                                
+                                {% if results.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?q={{ query }}&page={{ results.next_page_number }}{% if content_type %}&type={{ content_type }}{% endif %}{% if difficulty %}&difficulty={{ difficulty }}{% endif %}">
+                                            <i class="fas fa-angle-right"></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?q={{ query }}&page={{ results.paginator.num_pages }}{% if content_type %}&type={{ content_type }}{% endif %}{% if difficulty %}&difficulty={{ difficulty }}{% endif %}">
+                                            <i class="fas fa-angle-double-right"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            {% endif %}
+        {% else %}
+            <!-- No Results -->
+            <div class="no-results">
+                <i class="fas fa-search fa-4x mb-4"></i>
+                <h4>No Results Found</h4>
+                <p class="mb-4">
+                    We couldn't find any content matching "<strong>{{ query }}</strong>".
+                    {% if selected_filters %}Try removing some filters or {% endif %}Try different keywords.
+                </p>
+                
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <h6 class="fw-bold mb-2">Search Tips:</h6>
+                        <ul class="list-unstyled text-start">
+                            <li><i class="fas fa-check text-success me-2"></i>Try broader terms (e.g., "diabetes" instead of "type 2 diabetes management")</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Check your spelling</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Use fewer keywords</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Try synonyms or related terms</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <a href="{% url 'education:library' %}" class="btn btn-primary me-2">
+                        <i class="fas fa-book me-2"></i>Browse All Content
+                    </a>
+                    <a href="{% url 'education:home' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-home me-2"></i>Education Home
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    {% endif %}
+
+    <!-- Quick Links -->
+    {% if not query %}
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="card border-primary">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">
+                            <i class="fas fa-compass me-2"></i>
+                            Explore Education Resources
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-3 mb-2">
+                                <a href="{% url 'education:library' %}" class="btn btn-outline-primary w-100">
+                                    <i class="fas fa-book me-2"></i>Browse Library
+                                </a>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <a href="{% url 'education:recipes' %}" class="btn btn-outline-success w-100">
+                                    <i class="fas fa-utensils me-2"></i>Recipes
+                                </a>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <a href="{% url 'education:exercises' %}" class="btn btn-outline-info w-100">
+                                    <i class="fas fa-dumbbell me-2"></i>Exercises
+                                </a>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                {% if user.is_authenticated %}
+                                    <a href="{% url 'education:my_progress' %}" class="btn btn-outline-warning w-100">
+                                        <i class="fas fa-chart-line me-2"></i>My Progress
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'accounts:login' %}" class="btn btn-outline-warning w-100">
+                                        <i class="fas fa-sign-in-alt me-2"></i>Login
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-focus search input
+    const searchInput = document.querySelector('input[name="q"]');
+    if (searchInput && !searchInput.value) {
+        searchInput.focus();
+    }
+    
+    // Highlight search terms in results
+    const query = "{{ query|escapejs }}";
+    if (query) {
+        highlightSearchTerms(query);
+    }
+});
+
+function highlightSearchTerms(query) {
+    const terms = query.toLowerCase().split(' ');
+    const results = document.querySelectorAll('.search-result');
+    
+    results.forEach(result => {
+        const title = result.querySelector('h5 a');
+        const summary = result.querySelector('.text-muted');
+        
+        if (title) {
+            highlightInElement(title, terms);
+        }
+        if (summary) {
+            highlightInElement(summary, terms);
+        }
+    });
+}
+
+function highlightInElement(element, terms) {
+    let html = element.innerHTML;
+    
+    terms.forEach(term => {
+        if (term.length > 2) {
+            const regex = new RegExp(`(${term})`, 'gi');
+            html = html.replace(regex, '<span class="highlight">$1</span>');
+        }
+    });
+    
+    element.innerHTML = html;
+}
+</script>
+{% endblock %}

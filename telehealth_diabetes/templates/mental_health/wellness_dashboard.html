@@ -1,0 +1,381 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mental Wellness Dashboard - Telehealth Diabetes Care{% endblock %}
+
+{% block extra_css %}
+<style>
+.wellness-card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+}
+
+.wellness-card:hover {
+    transform: translateY(-2px);
+}
+
+.metric-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.mood-indicator {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin: 0 auto 1rem;
+}
+
+.mood-excellent { background-color: #28a745; }
+.mood-good { background-color: #17a2b8; }
+.mood-fair { background-color: #ffc107; }
+.mood-poor { background-color: #fd7e14; }
+.mood-bad { background-color: #dc3545; }
+
+.wellness-score {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #28a745;
+}
+
+.progress-ring {
+    transform: rotate(-90deg);
+}
+
+.progress-ring-circle {
+    transition: stroke-dasharray 0.35s;
+    transform-origin: 50% 50%;
+}
+
+.quick-actions .btn {
+    border-radius: 25px;
+    padding: 0.75rem 1.5rem;
+    margin: 0.25rem;
+}
+
+.mood-chart {
+    height: 300px;
+}
+
+.assessment-badge {
+    font-size: 0.8rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-brain text-primary me-2"></i>
+                        Mental Wellness Dashboard
+                    </h1>
+                    <p class="text-muted mb-0">Track your mental health and wellness journey</p>
+                </div>
+                <div class="quick-actions">
+                    <a href="{% url 'mental_health:mood_tracking' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Log Mood
+                    </a>
+                    <a href="{% url 'mental_health:assessments' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-clipboard-check me-2"></i>Take Assessment
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Wellness Score & Key Metrics -->
+    <div class="row mb-4">
+        <div class="col-lg-4 mb-3">
+            <div class="card wellness-card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Overall Wellness Score</h5>
+                    <div class="wellness-score mb-3">{{ wellness_score }}%</div>
+                    <div class="progress mb-3" style="height: 10px;">
+                        <div class="progress-bar bg-success" role="progressbar" 
+                             style="width: {{ wellness_score }}%" 
+                             aria-valuenow="{{ wellness_score }}" 
+                             aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <p class="text-muted small mb-0">
+                        {% if wellness_score >= 80 %}
+                            Excellent wellness! Keep up the great work.
+                        {% elif wellness_score >= 60 %}
+                            Good wellness. Consider some self-care activities.
+                        {% elif wellness_score >= 40 %}
+                            Fair wellness. Focus on mood and stress management.
+                        {% else %}
+                            Consider speaking with a mental health professional.
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-8">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <div class="metric-card">
+                        <div class="mood-indicator 
+                            {% if avg_mood >= 4.5 %}mood-excellent
+                            {% elif avg_mood >= 3.5 %}mood-good
+                            {% elif avg_mood >= 2.5 %}mood-fair
+                            {% elif avg_mood >= 1.5 %}mood-poor
+                            {% else %}mood-bad{% endif %}">
+                            {% if avg_mood >= 4.5 %}😊
+                            {% elif avg_mood >= 3.5 %}🙂
+                            {% elif avg_mood >= 2.5 %}😐
+                            {% elif avg_mood >= 1.5 %}🙁
+                            {% else %}😢{% endif %}
+                        </div>
+                        <h6>Average Mood</h6>
+                        <h3>{{ avg_mood }}/5</h3>
+                        <small>Last 30 days</small>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 mb-3">
+                    <div class="metric-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <div class="mood-indicator" style="background-color: rgba(255,255,255,0.2);">
+                            ⚡
+                        </div>
+                        <h6>Energy Level</h6>
+                        <h3>{{ avg_energy }}/5</h3>
+                        <small>Last 30 days</small>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 mb-3">
+                    <div class="metric-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <div class="mood-indicator" style="background-color: rgba(255,255,255,0.2);">
+                            {% if avg_stress <= 2 %}😌
+                            {% elif avg_stress <= 3 %}😐
+                            {% else %}😰{% endif %}
+                        </div>
+                        <h6>Stress Level</h6>
+                        <h3>{{ avg_stress }}/5</h3>
+                        <small>Last 30 days</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mood Trends & Recent Activity -->
+    <div class="row mb-4">
+        <div class="col-lg-8 mb-3">
+            <div class="card wellness-card">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-line me-2"></i>
+                        Mood Trends (Last 7 Days)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if mood_entries %}
+                        <canvas id="moodChart" class="mood-chart"></canvas>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No mood data yet</h5>
+                            <p class="text-muted">Start tracking your mood to see trends here.</p>
+                            <a href="{% url 'mental_health:mood_tracking' %}" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Log Your First Mood
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 mb-3">
+            <div class="card wellness-card h-100">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0">
+                        <i class="fas fa-clipboard-check me-2"></i>
+                        Recent Assessments
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_assessments %}
+                        {% for result in recent_assessments %}
+                            <div class="d-flex justify-content-between align-items-center mb-3 p-2 bg-light rounded">
+                                <div>
+                                    <h6 class="mb-1">{{ result.assessment.title }}</h6>
+                                    <small class="text-muted">{{ result.taken_at|date:"M d, Y" }}</small>
+                                </div>
+                                <span class="assessment-badge bg-primary text-white">
+                                    {{ result.score }}%
+                                </span>
+                            </div>
+                        {% endfor %}
+                        <div class="text-center">
+                            <a href="{% url 'mental_health:assessment_results' %}" class="btn btn-outline-primary btn-sm">
+                                View All Results
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-3">
+                            <i class="fas fa-clipboard-check fa-2x text-muted mb-2"></i>
+                            <p class="text-muted mb-2">No assessments taken yet</p>
+                            <a href="{% url 'mental_health:assessments' %}" class="btn btn-primary btn-sm">
+                                Take Assessment
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions & Resources -->
+    <div class="row">
+        <div class="col-lg-6 mb-3">
+            <div class="card wellness-card">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0">
+                        <i class="fas fa-rocket me-2"></i>
+                        Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <a href="{% url 'mental_health:mood_tracking' %}" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-smile me-2"></i>Log Mood
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <a href="{% url 'mental_health:assessments' %}" class="btn btn-outline-success w-100">
+                                <i class="fas fa-clipboard-check me-2"></i>Take Assessment
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <a href="{% url 'mental_health:coping_strategies' %}" class="btn btn-outline-info w-100">
+                                <i class="fas fa-lightbulb me-2"></i>Coping Tips
+                            </a>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <a href="{% url 'mental_health:resources' %}" class="btn btn-outline-warning w-100">
+                                <i class="fas fa-book me-2"></i>Resources
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6 mb-3">
+            <div class="card wellness-card">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Need Help?
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-3">If you're experiencing a mental health crisis or need immediate support:</p>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'mental_health:crisis_resources' %}" class="btn btn-danger">
+                            <i class="fas fa-phone me-2"></i>Crisis Resources
+                        </a>
+                        <a href="tel:0800720000" class="btn btn-outline-danger">
+                            <i class="fas fa-phone me-2"></i>Call Suicide Prevention: 0800 720 000
+                        </a>
+                    </div>
+                    <hr>
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Remember: This dashboard is for tracking purposes only and doesn't replace professional medical advice.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    {% if mood_entries %}
+    // Mood Chart
+    const ctx = document.getElementById('moodChart').getContext('2d');
+    const moodData = [
+        {% for entry in mood_entries reversed %}
+        {
+            date: '{{ entry.recorded_at|date:"M d" }}',
+            mood: {{ entry.mood_level }},
+            energy: {{ entry.energy_level }},
+            stress: {{ entry.stress_level }}
+        },
+        {% endfor %}
+    ];
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: moodData.map(d => d.date),
+            datasets: [{
+                label: 'Mood',
+                data: moodData.map(d => d.mood),
+                borderColor: '#28a745',
+                backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                tension: 0.4
+            }, {
+                label: 'Energy',
+                data: moodData.map(d => d.energy),
+                borderColor: '#17a2b8',
+                backgroundColor: 'rgba(23, 162, 184, 0.1)',
+                tension: 0.4
+            }, {
+                label: 'Stress',
+                data: moodData.map(d => d.stress),
+                borderColor: '#dc3545',
+                backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 5,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                }
+            }
+        }
+    });
+    {% endif %}
+});
+</script>
+{% endblock %}

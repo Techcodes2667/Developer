@@ -1,0 +1,124 @@
+name: telehealth-diabetes-care
+region: nyc1
+
+services:
+- name: web
+  source_dir: /My_tele_app/telehealth_diabetes
+  github:
+    repo: Techcodes2667/Developer
+    branch: main
+    deploy_on_push: true
+  
+  run_command: |
+    python manage.py migrate
+    python manage.py collectstatic --noinput
+    gunicorn telehealth_diabetes.wsgi:application --bind 0.0.0.0:$PORT --workers 3
+  
+  environment_slug: python
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  
+  http_port: 8080
+  
+  health_check:
+    http_path: /
+    initial_delay_seconds: 60
+    period_seconds: 10
+    timeout_seconds: 5
+    success_threshold: 1
+    failure_threshold: 3
+  
+  envs:
+  - key: DEBUG
+    value: "False"
+  - key: SECRET_KEY
+    value: "your-secret-key-change-this"
+    type: SECRET
+  - key: ALLOWED_HOSTS
+    value: "${APP_DOMAIN}"
+  - key: DATABASE_URL
+    value: "${db.DATABASE_URL}"
+  - key: REDIS_URL
+    value: "${redis.DATABASE_URL}"
+  - key: STATIC_ROOT
+    value: "/app/staticfiles"
+  - key: MEDIA_ROOT
+    value: "/app/media"
+
+databases:
+- name: db
+  engine: PG
+  version: "13"
+  size: basic-xs
+  num_nodes: 1
+
+- name: redis
+  engine: REDIS
+  version: "6"
+  size: basic-xs
+  num_nodes: 1
+
+static_sites:
+- name: static-assets
+  source_dir: /My_tele_app/telehealth_diabetes/staticfiles
+  github:
+    repo: Techcodes2667/Developer
+    branch: main
+  build_command: |
+    cd My_tele_app/telehealth_diabetes
+    python manage.py collectstatic --noinput
+  output_dir: /staticfiles
+  
+  routes:
+  - path: /static
+  
+  envs:
+  - key: SECRET_KEY
+    value: "your-secret-key-change-this"
+    type: SECRET
+
+workers:
+- name: celery-worker
+  source_dir: /My_tele_app/telehealth_diabetes
+  github:
+    repo: Techcodes2667/Developer
+    branch: main
+  
+  run_command: celery -A telehealth_diabetes worker --loglevel=info
+  
+  environment_slug: python
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  
+  envs:
+  - key: DEBUG
+    value: "False"
+  - key: SECRET_KEY
+    value: "your-secret-key-change-this"
+    type: SECRET
+  - key: DATABASE_URL
+    value: "${db.DATABASE_URL}"
+  - key: REDIS_URL
+    value: "${redis.DATABASE_URL}"
+
+jobs:
+- name: migrate
+  source_dir: /My_tele_app/telehealth_diabetes
+  github:
+    repo: Techcodes2667/Developer
+    branch: main
+  
+  run_command: python manage.py migrate
+  
+  environment_slug: python
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  
+  kind: PRE_DEPLOY
+  
+  envs:
+  - key: DATABASE_URL
+    value: "${db.DATABASE_URL}"
+  - key: SECRET_KEY
+    value: "your-secret-key-change-this"
+    type: SECRET

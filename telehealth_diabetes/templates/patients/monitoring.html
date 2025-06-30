@@ -1,0 +1,303 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Health Monitoring - Telehealth Diabetes Care{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">
+                    <i class="fas fa-chart-line me-2 text-primary"></i>
+                    Health Monitoring
+                </h1>
+                <div>
+                    <a href="{% url 'patients:dashboard' %}" class="btn btn-outline-secondary me-2">
+                        <i class="fas fa-arrow-left me-1"></i>Dashboard
+                    </a>
+                    <a href="{% url 'health_data:home' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i>Add Data
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Health Metrics Overview -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="text-danger mb-2">
+                        <i class="fas fa-tint fa-2x"></i>
+                    </div>
+                    <h6 class="card-title text-muted">Blood Glucose</h6>
+                    <h4 class="text-danger mb-1">{{ glucose_readings|length }}</h4>
+                    <small class="text-muted">readings recorded</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="text-success mb-2">
+                        <i class="fas fa-weight fa-2x"></i>
+                    </div>
+                    <h6 class="card-title text-muted">Weight</h6>
+                    <h4 class="text-success mb-1">{{ weight_readings|length }}</h4>
+                    <small class="text-muted">measurements</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="text-info mb-2">
+                        <i class="fas fa-heartbeat fa-2x"></i>
+                    </div>
+                    <h6 class="card-title text-muted">Blood Pressure</h6>
+                    <h4 class="text-info mb-1">0</h4>
+                    <small class="text-muted">readings</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="text-warning mb-2">
+                        <i class="fas fa-running fa-2x"></i>
+                    </div>
+                    <h6 class="card-title text-muted">Activity</h6>
+                    <h4 class="text-warning mb-1">0</h4>
+                    <small class="text-muted">sessions</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Blood Glucose Chart -->
+        <div class="col-lg-8 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-tint me-2 text-danger"></i>
+                        Blood Glucose Trends
+                    </h5>
+                    <div class="btn-group btn-group-sm" role="group">
+                        <input type="radio" class="btn-check" name="glucose-period" id="glucose-7d" checked>
+                        <label class="btn btn-outline-primary" for="glucose-7d">7 Days</label>
+                        
+                        <input type="radio" class="btn-check" name="glucose-period" id="glucose-30d">
+                        <label class="btn btn-outline-primary" for="glucose-30d">30 Days</label>
+                        
+                        <input type="radio" class="btn-check" name="glucose-period" id="glucose-90d">
+                        <label class="btn btn-outline-primary" for="glucose-90d">90 Days</label>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if glucose_readings %}
+                        <div class="chart-container" style="height: 300px;">
+                            <canvas id="glucoseChart"></canvas>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No glucose data yet</h5>
+                            <p class="text-muted">Start recording your blood glucose readings to see trends and patterns.</p>
+                            <a href="{% url 'health_data:glucose' %}" class="btn btn-primary">
+                                <i class="fas fa-plus me-1"></i>Record First Reading
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Readings -->
+        <div class="col-lg-4 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-clock me-2 text-primary"></i>
+                        Recent Readings
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if glucose_readings %}
+                        <div class="list-group list-group-flush">
+                            {% for reading in glucose_readings|slice:":5" %}
+                                <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">{{ reading.value }} mmol/L</h6>
+                                        <small class="text-muted">
+                                            {{ reading.get_measurement_type_display }}
+                                            <br>{{ reading.measured_at|date:"M d, g:i A" }}
+                                        </small>
+                                    </div>
+                                    <div>
+                                        {% if reading.value < 4.0 %}
+                                            <span class="badge bg-warning">Low</span>
+                                        {% elif reading.value > 10.0 %}
+                                            <span class="badge bg-danger">High</span>
+                                        {% else %}
+                                            <span class="badge bg-success">Normal</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="{% url 'health_data:glucose' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-3">
+                            <i class="fas fa-tint fa-2x text-muted mb-2"></i>
+                            <p class="text-muted mb-0">No readings yet</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Weight Tracking -->
+    <div class="row">
+        <div class="col-lg-8 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-weight me-2 text-success"></i>
+                        Weight Trends
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if weight_readings %}
+                        <div class="chart-container" style="height: 250px;">
+                            <canvas id="weightChart"></canvas>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-weight fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No weight data yet</h5>
+                            <p class="text-muted">Track your weight to monitor your health progress.</p>
+                            <a href="{% url 'health_data:weight' %}" class="btn btn-success">
+                                <i class="fas fa-plus me-1"></i>Record Weight
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="col-lg-4 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bolt me-2 text-warning"></i>
+                        Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'health_data:glucose' %}" class="btn btn-outline-danger">
+                            <i class="fas fa-tint me-2"></i>Record Glucose
+                        </a>
+                        <a href="{% url 'health_data:weight' %}" class="btn btn-outline-success">
+                            <i class="fas fa-weight me-2"></i>Record Weight
+                        </a>
+                        <a href="{% url 'health_data:activity' %}" class="btn btn-outline-info">
+                            <i class="fas fa-running me-2"></i>Log Activity
+                        </a>
+                        <a href="{% url 'health_data:reports' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-file-alt me-2"></i>Generate Report
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Health Tips -->
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-lightbulb me-2 text-info"></i>
+                        Health Tips
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6 class="mb-1">Monitor Regularly</h6>
+                        <small class="text-muted">Check your blood glucose at consistent times each day.</small>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="mb-1">Track Patterns</h6>
+                        <small class="text-muted">Look for patterns in your readings related to meals and activities.</small>
+                    </div>
+                    <div class="text-center">
+                        <a href="{% url 'education:home' %}" class="btn btn-sm btn-outline-info">More Tips</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js for data visualization -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Initialize charts if data exists
+{% if glucose_readings %}
+const glucoseCtx = document.getElementById('glucoseChart').getContext('2d');
+const glucoseChart = new Chart(glucoseCtx, {
+    type: 'line',
+    data: {
+        labels: [{% for reading in glucose_readings %}'{{ reading.measured_at|date:"M d" }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+        datasets: [{
+            label: 'Blood Glucose (mmol/L)',
+            data: [{% for reading in glucose_readings %}{{ reading.value }}{% if not forloop.last %},{% endif %}{% endfor %}],
+            borderColor: 'rgb(220, 53, 69)',
+            backgroundColor: 'rgba(220, 53, 69, 0.1)',
+            tension: 0.1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: false,
+                min: 3,
+                max: 15
+            }
+        }
+    }
+});
+{% endif %}
+
+{% if weight_readings %}
+const weightCtx = document.getElementById('weightChart').getContext('2d');
+const weightChart = new Chart(weightCtx, {
+    type: 'line',
+    data: {
+        labels: [{% for reading in weight_readings %}'{{ reading.measured_at|date:"M d" }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+        datasets: [{
+            label: 'Weight (kg)',
+            data: [{% for reading in weight_readings %}{{ reading.weight }}{% if not forloop.last %},{% endif %}{% endfor %}],
+            borderColor: 'rgb(25, 135, 84)',
+            backgroundColor: 'rgba(25, 135, 84, 0.1)',
+            tension: 0.1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false
+    }
+});
+{% endif %}
+</script>
+{% endblock %}

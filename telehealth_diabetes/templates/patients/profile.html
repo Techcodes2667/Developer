@@ -1,0 +1,262 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Profile - Telehealth Diabetes Care{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">
+                    <i class="fas fa-user-edit me-2 text-primary"></i>
+                    My Profile
+                </h1>
+                <a href="{% url 'patients:dashboard' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2 text-primary"></i>
+                        Personal Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <!-- Basic Information -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="first_name" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="first_name" name="first_name" 
+                                       value="{{ user.first_name }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="last_name" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="last_name" name="last_name" 
+                                       value="{{ user.last_name }}" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="email" name="email" 
+                                       value="{{ user.email }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="phone_number" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="phone_number" name="phone_number" 
+                                       value="{{ patient_profile.phone_number|default:'' }}" 
+                                       placeholder="+254 123 456 789">
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="date_of_birth" class="form-label">Date of Birth</label>
+                                <input type="date" class="form-control" id="date_of_birth" name="date_of_birth" 
+                                       value="{{ patient_profile.date_of_birth|date:'Y-m-d'|default:'' }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="gender" class="form-label">Gender</label>
+                                <select class="form-select" id="gender" name="gender">
+                                    <option value="">Select Gender</option>
+                                    <option value="M" {% if patient_profile.gender == 'M' %}selected{% endif %}>Male</option>
+                                    <option value="F" {% if patient_profile.gender == 'F' %}selected{% endif %}>Female</option>
+                                    <option value="O" {% if patient_profile.gender == 'O' %}selected{% endif %}>Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="address" class="form-label">Address</label>
+                            <textarea class="form-control" id="address" name="address" rows="3" 
+                                      placeholder="Your address in Kisumu or surrounding area">{{ patient_profile.address|default:'' }}</textarea>
+                        </div>
+
+                        <!-- Diabetes-Specific Information -->
+                        <h6 class="text-primary mb-3">
+                            <i class="fas fa-heartbeat me-2"></i>
+                            Diabetes Information
+                        </h6>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="diabetes_type" class="form-label">Diabetes Type</label>
+                                <select class="form-select" id="diabetes_type" name="diabetes_type">
+                                    <option value="">Select Type</option>
+                                    <option value="type1" {% if patient_profile.diabetes_type == 'type1' %}selected{% endif %}>Type 1 Diabetes</option>
+                                    <option value="type2" {% if patient_profile.diabetes_type == 'type2' %}selected{% endif %}>Type 2 Diabetes</option>
+                                    <option value="gestational" {% if patient_profile.diabetes_type == 'gestational' %}selected{% endif %}>Gestational Diabetes</option>
+                                    <option value="other" {% if patient_profile.diabetes_type == 'other' %}selected{% endif %}>Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="diagnosis_date" class="form-label">Diagnosis Date</label>
+                                <input type="date" class="form-control" id="diagnosis_date" name="diagnosis_date" 
+                                       value="{{ patient_profile.diagnosis_date|date:'Y-m-d'|default:'' }}">
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <label for="hba1c_target" class="form-label">HbA1c Target (%)</label>
+                                <input type="number" class="form-control" id="hba1c_target" name="hba1c_target" 
+                                       step="0.1" min="4.0" max="15.0" 
+                                       value="{{ patient_profile.hba1c_target|default:'' }}" 
+                                       placeholder="7.0">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="blood_glucose_target_min" class="form-label">Target Glucose Min (mmol/L)</label>
+                                <input type="number" class="form-control" id="blood_glucose_target_min" name="blood_glucose_target_min" 
+                                       step="0.1" min="3.0" max="30.0" 
+                                       value="{{ patient_profile.blood_glucose_target_min|default:'' }}" 
+                                       placeholder="4.0">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="blood_glucose_target_max" class="form-label">Target Glucose Max (mmol/L)</label>
+                                <input type="number" class="form-control" id="blood_glucose_target_max" name="blood_glucose_target_max" 
+                                       step="0.1" min="3.0" max="30.0" 
+                                       value="{{ patient_profile.blood_glucose_target_max|default:'' }}" 
+                                       placeholder="7.0">
+                            </div>
+                        </div>
+
+                        <!-- Healthcare Provider Information -->
+                        <h6 class="text-primary mb-3">
+                            <i class="fas fa-user-md me-2"></i>
+                            Healthcare Provider
+                        </h6>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="primary_doctor" class="form-label">Primary Doctor</label>
+                                <input type="text" class="form-control" id="primary_doctor" name="primary_doctor" 
+                                       value="{{ patient_profile.primary_doctor|default:'' }}" 
+                                       placeholder="Dr. John Doe">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="healthcare_facility" class="form-label">Healthcare Facility</label>
+                                <input type="text" class="form-control" id="healthcare_facility" name="healthcare_facility" 
+                                       value="{{ patient_profile.healthcare_facility|default:'' }}" 
+                                       placeholder="Kisumu General Hospital">
+                            </div>
+                        </div>
+
+                        <!-- Emergency Contact -->
+                        <h6 class="text-primary mb-3">
+                            <i class="fas fa-phone me-2"></i>
+                            Emergency Contact
+                        </h6>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="emergency_contact_name" class="form-label">Emergency Contact Name</label>
+                                <input type="text" class="form-control" id="emergency_contact_name" name="emergency_contact_name" 
+                                       value="{{ patient_profile.emergency_contact_name|default:'' }}" 
+                                       placeholder="Contact person name">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="emergency_contact_phone" class="form-label">Emergency Contact Phone</label>
+                                <input type="tel" class="form-control" id="emergency_contact_phone" name="emergency_contact_phone" 
+                                       value="{{ patient_profile.emergency_contact_phone|default:'' }}" 
+                                       placeholder="+254 123 456 789">
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{% url 'patients:dashboard' %}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>Save Profile
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Profile Summary -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user me-2 text-success"></i>
+                        Profile Summary
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <div class="bg-primary text-white rounded-circle mx-auto d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                            <i class="fas fa-user fa-2x"></i>
+                        </div>
+                        <h5 class="mt-2 mb-0">{{ user.get_full_name|default:user.username }}</h5>
+                        <small class="text-muted">{{ user.email }}</small>
+                    </div>
+                    
+                    {% if patient_profile %}
+                        <div class="mb-2">
+                            <strong>Age:</strong> 
+                            {% if patient_profile.age %}
+                                {{ patient_profile.age }} years
+                            {% else %}
+                                Not specified
+                            {% endif %}
+                        </div>
+                        <div class="mb-2">
+                            <strong>Diabetes Type:</strong> 
+                            {% if patient_profile.diabetes_type %}
+                                {{ patient_profile.get_diabetes_type_display }}
+                            {% else %}
+                                Not specified
+                            {% endif %}
+                        </div>
+                        <div class="mb-2">
+                            <strong>Member Since:</strong> {{ patient_profile.created_at|date:"M Y" }}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Complete your profile to get personalized care recommendations.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-link me-2 text-info"></i>
+                        Quick Links
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'health_data:home' %}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-chart-line me-2"></i>Health Data
+                        </a>
+                        <a href="{% url 'medication_management:list' %}" class="btn btn-outline-success btn-sm">
+                            <i class="fas fa-pills me-2"></i>Medications
+                        </a>
+                        <a href="{% url 'goals:list' %}" class="btn btn-outline-warning btn-sm">
+                            <i class="fas fa-bullseye me-2"></i>My Goals
+                        </a>
+                        <a href="{% url 'appointments:list' %}" class="btn btn-outline-info btn-sm">
+                            <i class="fas fa-calendar-alt me-2"></i>Appointments
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

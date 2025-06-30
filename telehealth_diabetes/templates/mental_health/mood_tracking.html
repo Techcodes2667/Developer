@@ -1,0 +1,338 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mood Tracking - Telehealth Diabetes Care{% endblock %}
+
+{% block extra_css %}
+<style>
+.mood-card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+}
+
+.mood-card:hover {
+    transform: translateY(-2px);
+}
+
+.mood-slider {
+    width: 100%;
+    height: 8px;
+    border-radius: 5px;
+    background: linear-gradient(to right, #dc3545, #fd7e14, #ffc107, #17a2b8, #28a745);
+    outline: none;
+    -webkit-appearance: none;
+}
+
+.mood-slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid #007bff;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.mood-slider::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid #007bff;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.mood-emoji {
+    font-size: 2rem;
+    text-align: center;
+}
+
+.mood-history-item {
+    border-left: 4px solid #007bff;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background: #f8f9fa;
+    border-radius: 0 8px 8px 0;
+}
+
+.stats-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-align: center;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-smile text-primary me-2"></i>
+                        Mood Tracking
+                    </h1>
+                    <p class="text-muted mb-0">Track your daily mood, energy, and stress levels</p>
+                </div>
+                <a href="{% url 'mental_health:dashboard' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-chart-line me-2"></i>View Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Mood Entry Form -->
+        <div class="col-lg-6 mb-4">
+            <div class="card mood-card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-plus me-2"></i>
+                        Log Your Mood
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post" id="moodForm">
+                        {% csrf_token %}
+                        
+                        <!-- Mood Level -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">How are you feeling today?</label>
+                            <div class="mood-emoji mb-2" id="moodEmoji">😐</div>
+                            <input type="range" class="mood-slider" id="moodLevel" name="mood_level" 
+                                   min="1" max="5" value="3" step="1">
+                            <div class="d-flex justify-content-between small text-muted mt-1">
+                                <span>Very Bad</span>
+                                <span>Bad</span>
+                                <span>Okay</span>
+                                <span>Good</span>
+                                <span>Excellent</span>
+                            </div>
+                        </div>
+
+                        <!-- Energy Level -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Energy Level</label>
+                            <div class="mood-emoji mb-2" id="energyEmoji">⚡</div>
+                            <input type="range" class="mood-slider" id="energyLevel" name="energy_level" 
+                                   min="1" max="5" value="3" step="1">
+                            <div class="d-flex justify-content-between small text-muted mt-1">
+                                <span>Very Low</span>
+                                <span>Low</span>
+                                <span>Moderate</span>
+                                <span>High</span>
+                                <span>Very High</span>
+                            </div>
+                        </div>
+
+                        <!-- Stress Level -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Stress Level</label>
+                            <div class="mood-emoji mb-2" id="stressEmoji">😐</div>
+                            <input type="range" class="mood-slider" id="stressLevel" name="stress_level" 
+                                   min="1" max="5" value="3" step="1">
+                            <div class="d-flex justify-content-between small text-muted mt-1">
+                                <span>Very Low</span>
+                                <span>Low</span>
+                                <span>Moderate</span>
+                                <span>High</span>
+                                <span>Very High</span>
+                            </div>
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="mb-4">
+                            <label for="notes" class="form-label fw-bold">Notes (Optional)</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3" 
+                                      placeholder="What's on your mind? Any specific events or thoughts?"></textarea>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Save Mood Entry
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics & Recent Entries -->
+        <div class="col-lg-6">
+            <!-- Weekly Stats -->
+            <div class="row mb-4">
+                <div class="col-md-4 mb-3">
+                    <div class="stats-card">
+                        <div class="h4 mb-1">{{ avg_mood }}</div>
+                        <small>Avg Mood</small>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="stats-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <div class="h4 mb-1">{{ avg_energy }}</div>
+                        <small>Avg Energy</small>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="stats-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <div class="h4 mb-1">{{ avg_stress }}</div>
+                        <small>Avg Stress</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Entries -->
+            <div class="card mood-card">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0">
+                        <i class="fas fa-history me-2"></i>
+                        Recent Entries
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_moods %}
+                        <div style="max-height: 400px; overflow-y: auto;">
+                            {% for mood in recent_moods %}
+                                <div class="mood-history-item">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <div class="fw-bold">{{ mood.recorded_at|date:"M d, Y" }}</div>
+                                            <small class="text-muted">{{ mood.recorded_at|time:"g:i A" }}</small>
+                                        </div>
+                                        <div class="text-end">
+                                            <div class="small">
+                                                <span class="badge bg-primary me-1">Mood: {{ mood.mood_level }}/5</span>
+                                                <span class="badge bg-info me-1">Energy: {{ mood.energy_level }}/5</span>
+                                                <span class="badge bg-warning">Stress: {{ mood.stress_level }}/5</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% if mood.notes %}
+                                        <div class="mt-2 small text-muted">
+                                            <i class="fas fa-quote-left me-1"></i>
+                                            {{ mood.notes }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-smile fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No mood entries yet</h5>
+                            <p class="text-muted">Start tracking your mood to see your history here.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Tips -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card mood-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-lightbulb text-warning me-2"></i>
+                        Mood Tracking Tips
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Track your mood at the same time each day
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Be honest about how you're feeling
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Note any triggers or events in the notes section
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Look for patterns over time
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Share your data with your healthcare provider
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Use the dashboard to track trends
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const moodSlider = document.getElementById('moodLevel');
+    const energySlider = document.getElementById('energyLevel');
+    const stressSlider = document.getElementById('stressLevel');
+    
+    const moodEmoji = document.getElementById('moodEmoji');
+    const energyEmoji = document.getElementById('energyEmoji');
+    const stressEmoji = document.getElementById('stressEmoji');
+    
+    const moodEmojis = ['😢', '🙁', '😐', '🙂', '😊'];
+    const energyEmojis = ['🔋', '🪫', '⚡', '⚡⚡', '⚡⚡⚡'];
+    const stressEmojis = ['😌', '😐', '😟', '😰', '😱'];
+    
+    function updateMoodEmoji() {
+        const value = parseInt(moodSlider.value) - 1;
+        moodEmoji.textContent = moodEmojis[value];
+    }
+    
+    function updateEnergyEmoji() {
+        const value = parseInt(energySlider.value) - 1;
+        energyEmoji.textContent = energyEmojis[value];
+    }
+    
+    function updateStressEmoji() {
+        const value = parseInt(stressSlider.value) - 1;
+        stressEmoji.textContent = stressEmojis[value];
+    }
+    
+    moodSlider.addEventListener('input', updateMoodEmoji);
+    energySlider.addEventListener('input', updateEnergyEmoji);
+    stressSlider.addEventListener('input', updateStressEmoji);
+    
+    // Initialize emojis
+    updateMoodEmoji();
+    updateEnergyEmoji();
+    updateStressEmoji();
+});
+</script>
+{% endblock %}

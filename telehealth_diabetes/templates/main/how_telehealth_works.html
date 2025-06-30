@@ -1,0 +1,256 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}How Telehealth Works - Telehealth Diabetes Care{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Header Section -->
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h1 class="display-4 fw-bold text-primary mb-3">
+                <i class="fas fa-stethoscope me-3"></i>
+                How Telehealth Works
+            </h1>
+            <p class="lead text-muted">
+                Understanding telehealth technology and its benefits for diabetes management in Kisumu and beyond
+            </p>
+        </div>
+    </div>
+
+    <!-- What is Telehealth Section -->
+    <div class="row mb-5">
+        <div class="col-lg-6 mb-4">
+            <h2 class="h3 text-primary mb-3">What is Telehealth?</h2>
+            <p class="text-muted mb-3">
+                Telehealth uses digital technology to deliver healthcare services remotely. It enables patients 
+                to receive medical care, education, and support from healthcare professionals without the need 
+                for in-person visits.
+            </p>
+            <p class="text-muted">
+                For diabetes management, telehealth provides continuous monitoring, real-time consultations, 
+                and personalized care plans that help patients maintain better control of their condition.
+            </p>
+        </div>
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center py-4">
+                    <i class="fas fa-laptop-medical fa-4x text-primary mb-3"></i>
+                    <h5 class="text-primary">Remote Healthcare Delivery</h5>
+                    <p class="text-muted mb-0">
+                        Access quality diabetes care from anywhere with internet connectivity
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Telehealth Taxonomy Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="h3 text-primary mb-4">
+                <i class="fas fa-sitemap me-2"></i>
+                Telehealth Services We Offer
+            </h2>
+        </div>
+        {% for service in telehealth_taxonomy %}
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        {% if forloop.counter == 1 %}
+                            <i class="fas fa-graduation-cap fa-3x text-info"></i>
+                        {% elif forloop.counter == 2 %}
+                            <i class="fas fa-comments fa-3x text-success"></i>
+                        {% elif forloop.counter == 3 %}
+                            <i class="fas fa-video fa-3x text-primary"></i>
+                        {% elif forloop.counter == 4 %}
+                            <i class="fas fa-chart-line fa-3x text-warning"></i>
+                        {% elif forloop.counter == 5 %}
+                            <i class="fas fa-cloud-upload-alt fa-3x text-secondary"></i>
+                        {% else %}
+                            <i class="fas fa-user-circle fa-3x text-danger"></i>
+                        {% endif %}
+                    </div>
+                    <h5 class="card-title">{{ service.name }}</h5>
+                    <p class="card-text text-muted">{{ service.description }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- How It Works Process -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="h3 text-primary mb-4">
+                <i class="fas fa-cogs me-2"></i>
+                Simple 4-Step Process
+            </h2>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="bg-primary text-white rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                        <span class="h4 mb-0">1</span>
+                    </div>
+                    <h5 class="card-title">Sign Up</h5>
+                    <p class="card-text text-muted">Create your account and complete your health profile</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="bg-success text-white rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                        <span class="h4 mb-0">2</span>
+                    </div>
+                    <h5 class="card-title">Schedule</h5>
+                    <p class="card-text text-muted">Book an appointment with a diabetes specialist</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="bg-info text-white rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                        <span class="h4 mb-0">3</span>
+                    </div>
+                    <h5 class="card-title">Connect</h5>
+                    <p class="card-text text-muted">Join your virtual consultation from any device</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="bg-warning text-white rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                        <span class="h4 mb-0">4</span>
+                    </div>
+                    <h5 class="card-title">Manage</h5>
+                    <p class="card-text text-muted">Track your health data and follow your care plan</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Benefits Section -->
+    <div class="row mb-5">
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-thumbs-up me-2"></i>
+                        Benefits of Telehealth
+                    </h4>
+                </div>
+                <div class="card-body">
+                    {% for benefit in telehealth_benefits %}
+                    <div class="d-flex align-items-start mb-3">
+                        <i class="fas fa-check-circle text-success me-3 mt-1"></i>
+                        <span>{{ benefit }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-shield-alt me-2"></i>
+                        Addressing Challenges
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h6 class="text-primary">Data Privacy & Security</h6>
+                        <p class="text-muted mb-0">
+                            We use industry-standard encryption and comply with healthcare privacy regulations 
+                            to protect your personal health information.
+                        </p>
+                    </div>
+                    <div class="mb-4">
+                        <h6 class="text-primary">Technology Access</h6>
+                        <p class="text-muted mb-0">
+                            Our platform works on basic smartphones and computers. We also provide 
+                            community support programs to help patients in Kisumu access technology.
+                        </p>
+                    </div>
+                    <div>
+                        <h6 class="text-primary">Internet Connectivity</h6>
+                        <p class="text-muted mb-0">
+                            Our system is optimized for low-bandwidth connections and offers offline 
+                            capabilities for essential features.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Technology Requirements -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-laptop me-2"></i>
+                        What You Need to Get Started
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="text-center">
+                                <i class="fas fa-mobile-alt fa-3x text-primary mb-2"></i>
+                                <h6>Device</h6>
+                                <p class="text-muted mb-0">Smartphone, tablet, or computer with camera and microphone</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="text-center">
+                                <i class="fas fa-wifi fa-3x text-success mb-2"></i>
+                                <h6>Internet Connection</h6>
+                                <p class="text-muted mb-0">Stable internet connection (works with basic mobile data)</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="text-center">
+                                <i class="fas fa-globe fa-3x text-info mb-2"></i>
+                                <h6>Web Browser</h6>
+                                <p class="text-muted mb-0">Modern web browser (Chrome, Firefox, Safari, or Edge)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call to Action -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm bg-gradient" style="background: linear-gradient(135deg, #0d6efd 0%, #0056b3 100%);">
+                <div class="card-body text-center py-5 text-white">
+                    <h3 class="mb-3">Ready to Experience Telehealth?</h3>
+                    <p class="lead mb-4">
+                        Join thousands of patients in Kisumu and beyond who are managing their diabetes with our telehealth platform.
+                    </p>
+                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+                        <a href="{% url 'main:signup' %}" class="btn btn-light btn-lg">
+                            <i class="fas fa-user-plus me-2"></i>Get Started Free
+                        </a>
+                        <a href="{% url 'appointments:schedule' %}" class="btn btn-outline-light btn-lg">
+                            <i class="fas fa-calendar-plus me-2"></i>Schedule Consultation
+                        </a>
+                        <a href="{% url 'main:contact' %}" class="btn btn-outline-light btn-lg">
+                            <i class="fas fa-question-circle me-2"></i>Have Questions?
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

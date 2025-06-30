@@ -1,0 +1,380 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Education Library - Telehealth Diabetes Care{% endblock %}
+
+{% block extra_css %}
+<style>
+.education-card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    height: 100%;
+}
+
+.education-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+.content-type-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 15px;
+}
+
+.difficulty-badge {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 10px;
+}
+
+.search-filters {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
+    padding: 2rem;
+    color: white;
+    margin-bottom: 2rem;
+}
+
+.filter-btn {
+    border: 2px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.1);
+    color: white;
+    border-radius: 25px;
+    padding: 0.5rem 1rem;
+    margin: 0.25rem;
+    transition: all 0.3s ease;
+}
+
+.filter-btn:hover, .filter-btn.active {
+    background: rgba(255,255,255,0.2);
+    border-color: rgba(255,255,255,0.6);
+    color: white;
+}
+
+.content-image {
+    height: 200px;
+    object-fit: cover;
+    border-radius: 15px 15px 0 0;
+}
+
+.read-time {
+    color: #6c757d;
+    font-size: 0.8rem;
+}
+
+.view-count {
+    color: #6c757d;
+    font-size: 0.8rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-5 fw-bold text-center mb-2">
+                <i class="fas fa-graduation-cap text-primary me-3"></i>
+                Education Library
+            </h1>
+            <p class="lead text-center text-muted">
+                Comprehensive diabetes education resources to help you manage your health
+            </p>
+        </div>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="search-filters">
+        <form method="get" class="row align-items-end">
+            <div class="col-lg-6 mb-3">
+                <label for="search" class="form-label fw-bold">Search Content</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="search" name="search" 
+                           value="{{ search_query }}" placeholder="Search articles, videos, recipes...">
+                    <button class="btn btn-light" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="col-lg-6 mb-3">
+                <label for="category" class="form-label fw-bold">Category</label>
+                <select class="form-select" id="category" name="category">
+                    <option value="">All Categories</option>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}" 
+                                {% if selected_category == category.id|stringformat:"s" %}selected{% endif %}>
+                            {{ category.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </form>
+        
+        <!-- Quick Filters -->
+        <div class="mt-3">
+            <h6 class="fw-bold mb-2">Quick Filters:</h6>
+            <div class="d-flex flex-wrap">
+                <a href="{% url 'education:library' %}" 
+                   class="filter-btn {% if not request.GET.category %}active{% endif %}">
+                    All Content
+                </a>
+                {% for category in categories %}
+                    <a href="{% url 'education:library' %}?category={{ category.id }}" 
+                       class="filter-btn {% if selected_category == category.id|stringformat:"s" %}active{% endif %}">
+                        <i class="{{ category.icon }} me-1"></i>{{ category.name }}
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Summary -->
+    {% if search_query or selected_category %}
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    {% if search_query %}
+                        Showing results for "<strong>{{ search_query }}</strong>"
+                        {% if selected_category_obj %} in category "<strong>{{ selected_category_obj.name }}</strong>"{% endif %}
+                    {% elif selected_category_obj %}
+                        Showing content in category "<strong>{{ selected_category_obj.name }}</strong>"
+                    {% endif %}
+                    - {{ content.paginator.count }} result{{ content.paginator.count|pluralize }} found
+                    <a href="{% url 'education:library' %}" class="btn btn-sm btn-outline-primary ms-2">
+                        <i class="fas fa-times me-1"></i>Clear Filters
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Content Grid -->
+    <div class="row">
+        {% for item in content %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card education-card">
+                    <div class="position-relative">
+                        {% if item.image %}
+                            <img src="{{ item.image.url }}" class="card-img-top content-image" alt="{{ item.title }}">
+                        {% else %}
+                            <div class="content-image bg-gradient-primary d-flex align-items-center justify-content-center">
+                                <i class="fas fa-book fa-3x text-white"></i>
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Content Type Badge -->
+                        <span class="badge content-type-badge 
+                            {% if item.content_type == 'article' %}bg-primary
+                            {% elif item.content_type == 'video' %}bg-danger
+                            {% elif item.content_type == 'quiz' %}bg-success
+                            {% elif item.content_type == 'recipe' %}bg-warning
+                            {% else %}bg-info{% endif %}">
+                            {% if item.content_type == 'article' %}<i class="fas fa-file-alt me-1"></i>
+                            {% elif item.content_type == 'video' %}<i class="fas fa-play me-1"></i>
+                            {% elif item.content_type == 'quiz' %}<i class="fas fa-question-circle me-1"></i>
+                            {% elif item.content_type == 'recipe' %}<i class="fas fa-utensils me-1"></i>
+                            {% else %}<i class="fas fa-info-circle me-1"></i>{% endif %}
+                            {{ item.get_content_type_display }}
+                        </span>
+                    </div>
+                    
+                    <div class="card-body d-flex flex-column">
+                        <div class="mb-2">
+                            <span class="difficulty-badge 
+                                {% if item.difficulty_level == 'beginner' %}bg-success text-white
+                                {% elif item.difficulty_level == 'intermediate' %}bg-warning text-dark
+                                {% else %}bg-danger text-white{% endif %}">
+                                {{ item.get_difficulty_level_display }}
+                            </span>
+                        </div>
+                        
+                        <h5 class="card-title">{{ item.title }}</h5>
+                        <p class="card-text text-muted flex-grow-1">{{ item.summary|truncatewords:20 }}</p>
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            {% if item.estimated_read_time %}
+                                <small class="read-time">
+                                    <i class="fas fa-clock me-1"></i>{{ item.estimated_read_time }} min read
+                                </small>
+                            {% endif %}
+                            <small class="view-count">
+                                <i class="fas fa-eye me-1"></i>{{ item.view_count }} views
+                            </small>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'education:content_detail' item.slug %}" 
+                               class="btn btn-primary flex-grow-1">
+                                <i class="fas fa-book-open me-2"></i>Read More
+                            </a>
+                            {% if user.is_authenticated %}
+                                <button class="btn btn-outline-secondary bookmark-btn" 
+                                        data-content-id="{{ item.id }}"
+                                        title="Bookmark">
+                                    <i class="fas fa-bookmark"></i>
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="text-center py-5">
+                    <i class="fas fa-search fa-4x text-muted mb-4"></i>
+                    <h4 class="text-muted">No Content Found</h4>
+                    <p class="text-muted">
+                        {% if search_query %}
+                            No content matches your search criteria. Try different keywords or browse by category.
+                        {% else %}
+                            No educational content is available at the moment. Check back soon!
+                        {% endif %}
+                    </p>
+                    {% if search_query or selected_category %}
+                        <a href="{% url 'education:library' %}" class="btn btn-primary">
+                            <i class="fas fa-refresh me-2"></i>View All Content
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if content.has_other_pages %}
+        <div class="row mt-4">
+            <div class="col-12">
+                <nav aria-label="Content pagination">
+                    <ul class="pagination justify-content-center">
+                        {% if content.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}">
+                                    <i class="fas fa-angle-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ content.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}">
+                                    <i class="fas fa-angle-left"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                        
+                        <li class="page-item active">
+                            <span class="page-link">
+                                Page {{ content.number }} of {{ content.paginator.num_pages }}
+                            </span>
+                        </li>
+                        
+                        {% if content.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ content.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}">
+                                    <i class="fas fa-angle-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ content.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}">
+                                    <i class="fas fa-angle-double-right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Quick Actions -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card border-primary">
+                <div class="card-body text-center">
+                    <h5 class="card-title">
+                        <i class="fas fa-lightbulb text-warning me-2"></i>
+                        Explore More Resources
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-4 mb-2">
+                            <a href="{% url 'education:recipes' %}" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-utensils me-2"></i>Diabetes-Friendly Recipes
+                            </a>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <a href="{% url 'education:exercises' %}" class="btn btn-outline-success w-100">
+                                <i class="fas fa-dumbbell me-2"></i>Exercise Routines
+                            </a>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            {% if user.is_authenticated %}
+                                <a href="{% url 'education:my_progress' %}" class="btn btn-outline-info w-100">
+                                    <i class="fas fa-chart-line me-2"></i>My Progress
+                                </a>
+                            {% else %}
+                                <a href="{% url 'accounts:login' %}" class="btn btn-outline-info w-100">
+                                    <i class="fas fa-sign-in-alt me-2"></i>Login to Track Progress
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Bookmark functionality
+    const bookmarkBtns = document.querySelectorAll('.bookmark-btn');
+    bookmarkBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const contentId = this.dataset.contentId;
+            
+            fetch(`{% url 'education:bookmark' 0 %}`.replace('0', contentId), {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    this.classList.add('btn-warning');
+                    this.classList.remove('btn-outline-secondary');
+                    this.innerHTML = '<i class="fas fa-bookmark"></i>';
+                    
+                    // Show success message
+                    const alert = document.createElement('div');
+                    alert.className = 'alert alert-success alert-dismissible fade show position-fixed';
+                    alert.style.top = '20px';
+                    alert.style.right = '20px';
+                    alert.style.zIndex = '9999';
+                    alert.innerHTML = `
+                        <i class="fas fa-check me-2"></i>Content bookmarked!
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    `;
+                    document.body.appendChild(alert);
+                    
+                    setTimeout(() => {
+                        alert.remove();
+                    }, 3000);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

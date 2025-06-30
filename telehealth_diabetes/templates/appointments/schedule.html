@@ -1,0 +1,510 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Schedule Appointment - Telehealth Diabetes Care{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">
+                    <i class="fas fa-calendar-plus me-2 text-primary"></i>
+                    Schedule New Appointment
+                </h1>
+                <a href="{% url 'appointments:list' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>My Appointments
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user-md me-2 text-primary"></i>
+                        Appointment Details
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="appointmentForm">
+                        {% csrf_token %}
+                        
+                        <!-- Step 1: Select Provider -->
+                        <div class="step" id="step1">
+                            <h6 class="text-primary mb-3">Step 1: Choose Healthcare Provider</h6>
+                            
+                            <div class="row">
+                                {% for provider in providers %}
+                                <div class="col-md-6 mb-3">
+                                    <div class="card provider-card" data-provider-id="{{ provider.id }}">
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center">
+                                                <div class="me-3">
+                                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                                        <i class="fas fa-user-md"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-1">{{ provider.user.get_full_name }}</h6>
+                                                    <p class="text-muted mb-1">{{ provider.get_specialization_display }}</p>
+                                                    <small class="text-muted">
+                                                        {% if provider.years_experience %}
+                                                            {{ provider.years_experience }} years experience
+                                                        {% endif %}
+                                                        {% if provider.average_rating > 0 %}
+                                                            | ⭐ {{ provider.average_rating|floatformat:1 }}
+                                                        {% endif %}
+                                                    </small>
+                                                </div>
+                                                <div>
+                                                    <input type="radio" class="form-check-input" name="provider_id" value="{{ provider.id }}" required>
+                                                </div>
+                                            </div>
+                                            {% if provider.bio %}
+                                                <p class="text-muted mt-2 mb-0">{{ provider.bio|truncatewords:20 }}</p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            
+                            <div class="text-end">
+                                <button type="button" class="btn btn-primary" onclick="nextStep(2)">
+                                    Next: Appointment Type <i class="fas fa-arrow-right ms-1"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Select Appointment Type -->
+                        <div class="step" id="step2" style="display: none;">
+                            <h6 class="text-primary mb-3">Step 2: Appointment Type</h6>
+                            
+                            <div class="row">
+                                {% for type_code, type_name in appointment_types %}
+                                <div class="col-md-6 mb-3">
+                                    <div class="card appointment-type-card" data-type="{{ type_code }}">
+                                        <div class="card-body text-center">
+                                            <div class="mb-2">
+                                                {% if type_code == 'consultation' %}
+                                                    <i class="fas fa-stethoscope fa-2x text-primary"></i>
+                                                {% elif type_code == 'follow_up' %}
+                                                    <i class="fas fa-redo fa-2x text-success"></i>
+                                                {% elif type_code == 'education' %}
+                                                    <i class="fas fa-graduation-cap fa-2x text-info"></i>
+                                                {% elif type_code == 'nutrition' %}
+                                                    <i class="fas fa-apple-alt fa-2x text-warning"></i>
+                                                {% elif type_code == 'mental_health' %}
+                                                    <i class="fas fa-brain fa-2x text-purple"></i>
+                                                {% else %}
+                                                    <i class="fas fa-pills fa-2x text-danger"></i>
+                                                {% endif %}
+                                            </div>
+                                            <h6 class="card-title">{{ type_name }}</h6>
+                                            <input type="radio" class="form-check-input" name="appointment_type" value="{{ type_code }}" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            
+                            <div class="d-flex justify-content-between">
+                                <button type="button" class="btn btn-secondary" onclick="prevStep(1)">
+                                    <i class="fas fa-arrow-left me-1"></i>Previous
+                                </button>
+                                <button type="button" class="btn btn-primary" onclick="nextStep(3)">
+                                    Next: Date & Time <i class="fas fa-arrow-right ms-1"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Select Date and Time -->
+                        <div class="step" id="step3" style="display: none;">
+                            <h6 class="text-primary mb-3">Step 3: Select Date & Time</h6>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="appointment_date" class="form-label">Select Date</label>
+                                    <input type="date" class="form-control" id="appointment_date" name="appointment_date" 
+                                           min="{{ "now"|date:"Y-m-d" }}" required onchange="loadAvailableSlots()">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Available Time Slots</label>
+                                    <div id="time_slots" class="border rounded p-3" style="min-height: 100px;">
+                                        <div class="text-center text-muted">
+                                            <i class="fas fa-clock fa-2x mb-2"></i>
+                                            <p>Select a date to see available times</p>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="scheduled_datetime" id="scheduled_datetime" required>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between mt-3">
+                                <button type="button" class="btn btn-secondary" onclick="prevStep(2)">
+                                    <i class="fas fa-arrow-left me-1"></i>Previous
+                                </button>
+                                <button type="button" class="btn btn-primary" onclick="nextStep(4)">
+                                    Next: Details <i class="fas fa-arrow-right ms-1"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Step 4: Appointment Details -->
+                        <div class="step" id="step4" style="display: none;">
+                            <h6 class="text-primary mb-3">Step 4: Appointment Details</h6>
+                            
+                            <div class="mb-3">
+                                <label for="chief_complaint" class="form-label">Main Concern *</label>
+                                <textarea class="form-control" id="chief_complaint" name="chief_complaint" rows="3" 
+                                          placeholder="Briefly describe your main health concern or reason for this appointment" required></textarea>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="symptoms" class="form-label">Current Symptoms</label>
+                                <textarea class="form-control" id="symptoms" name="symptoms" rows="3" 
+                                          placeholder="Describe any symptoms you're experiencing (optional)"></textarea>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="questions" class="form-label">Questions for Your Provider</label>
+                                <textarea class="form-control" id="questions" name="questions" rows="3" 
+                                          placeholder="Any specific questions you'd like to ask during the appointment (optional)"></textarea>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between">
+                                <button type="button" class="btn btn-secondary" onclick="prevStep(3)">
+                                    <i class="fas fa-arrow-left me-1"></i>Previous
+                                </button>
+                                <button type="button" class="btn btn-primary" onclick="nextStep(5)">
+                                    Review & Confirm <i class="fas fa-arrow-right ms-1"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Step 5: Review and Confirm -->
+                        <div class="step" id="step5" style="display: none;">
+                            <h6 class="text-primary mb-3">Step 5: Review & Confirm</h6>
+                            
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title">Appointment Summary</h6>
+                                    <div id="appointment_summary">
+                                        <!-- Summary will be populated by JavaScript -->
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-check mt-3">
+                                <input class="form-check-input" type="checkbox" id="terms_agreement" required>
+                                <label class="form-check-label" for="terms_agreement">
+                                    I agree to the <a href="{% url 'main:terms' %}" target="_blank">Terms of Service</a> 
+                                    and understand the telehealth consultation process.
+                                </label>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between mt-3">
+                                <button type="button" class="btn btn-secondary" onclick="prevStep(4)">
+                                    <i class="fas fa-arrow-left me-1"></i>Previous
+                                </button>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-check me-1"></i>Confirm Appointment
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Progress Indicator -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list-ol me-2 text-info"></i>
+                        Progress
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="progress-step" data-step="1">
+                        <div class="step-number active">1</div>
+                        <div class="step-label">Choose Provider</div>
+                    </div>
+                    <div class="progress-step" data-step="2">
+                        <div class="step-number">2</div>
+                        <div class="step-label">Appointment Type</div>
+                    </div>
+                    <div class="progress-step" data-step="3">
+                        <div class="step-number">3</div>
+                        <div class="step-label">Date & Time</div>
+                    </div>
+                    <div class="progress-step" data-step="4">
+                        <div class="step-number">4</div>
+                        <div class="step-label">Details</div>
+                    </div>
+                    <div class="progress-step" data-step="5">
+                        <div class="step-number">5</div>
+                        <div class="step-label">Confirm</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Appointment Tips -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-lightbulb me-2 text-warning"></i>
+                        Appointment Tips
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6 class="mb-1">Prepare in Advance</h6>
+                        <small class="text-muted">Have your blood glucose logs, medications list, and questions ready.</small>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="mb-1">Test Your Technology</h6>
+                        <small class="text-muted">Ensure your camera, microphone, and internet connection work properly.</small>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="mb-1">Find a Quiet Space</h6>
+                        <small class="text-muted">Choose a private, well-lit area for your consultation.</small>
+                    </div>
+                    <div class="text-center">
+                        <a href="{% url 'main:how_telehealth_works' %}" class="btn btn-sm btn-outline-info">
+                            Learn More About Telehealth
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.provider-card, .appointment-type-card {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.provider-card:hover, .appointment-type-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.provider-card.selected, .appointment-type-card.selected {
+    border-color: #0d6efd;
+    background-color: #f8f9ff;
+}
+
+.time-slot {
+    display: inline-block;
+    margin: 5px;
+    padding: 8px 12px;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.time-slot:hover {
+    background-color: #e9ecef;
+}
+
+.time-slot.selected {
+    background-color: #0d6efd;
+    color: white;
+    border-color: #0d6efd;
+}
+
+.progress-step {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.step-number {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #e9ecef;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+.step-number.active {
+    background-color: #0d6efd;
+    color: white;
+}
+
+.step-number.completed {
+    background-color: #198754;
+    color: white;
+}
+
+.step-label {
+    font-weight: 500;
+}
+</style>
+
+<script>
+let currentStep = 1;
+let selectedProvider = null;
+let selectedType = null;
+let selectedDateTime = null;
+
+function nextStep(step) {
+    // Validate current step
+    if (!validateStep(currentStep)) {
+        return;
+    }
+    
+    // Hide current step
+    document.getElementById(`step${currentStep}`).style.display = 'none';
+    
+    // Update progress
+    document.querySelector(`[data-step="${currentStep}"] .step-number`).classList.remove('active');
+    document.querySelector(`[data-step="${currentStep}"] .step-number`).classList.add('completed');
+    
+    // Show next step
+    currentStep = step;
+    document.getElementById(`step${currentStep}`).style.display = 'block';
+    document.querySelector(`[data-step="${currentStep}"] .step-number`).classList.add('active');
+    
+    // Update summary if on final step
+    if (currentStep === 5) {
+        updateSummary();
+    }
+}
+
+function prevStep(step) {
+    // Hide current step
+    document.getElementById(`step${currentStep}`).style.display = 'none';
+    document.querySelector(`[data-step="${currentStep}"] .step-number`).classList.remove('active');
+    
+    // Show previous step
+    currentStep = step;
+    document.getElementById(`step${currentStep}`).style.display = 'block';
+    document.querySelector(`[data-step="${currentStep}"] .step-number`).classList.add('active');
+    document.querySelector(`[data-step="${currentStep}"] .step-number`).classList.remove('completed');
+}
+
+function validateStep(step) {
+    switch(step) {
+        case 1:
+            const provider = document.querySelector('input[name="provider_id"]:checked');
+            if (!provider) {
+                alert('Please select a healthcare provider');
+                return false;
+            }
+            selectedProvider = provider.value;
+            return true;
+        case 2:
+            const type = document.querySelector('input[name="appointment_type"]:checked');
+            if (!type) {
+                alert('Please select an appointment type');
+                return false;
+            }
+            selectedType = type.value;
+            return true;
+        case 3:
+            const datetime = document.getElementById('scheduled_datetime').value;
+            if (!datetime) {
+                alert('Please select a date and time');
+                return false;
+            }
+            selectedDateTime = datetime;
+            return true;
+        case 4:
+            const complaint = document.getElementById('chief_complaint').value;
+            if (!complaint.trim()) {
+                alert('Please describe your main concern');
+                return false;
+            }
+            return true;
+        default:
+            return true;
+    }
+}
+
+function loadAvailableSlots() {
+    const date = document.getElementById('appointment_date').value;
+    const providerId = selectedProvider;
+    
+    if (!date || !providerId) return;
+    
+    const slotsContainer = document.getElementById('time_slots');
+    slotsContainer.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+    
+    fetch(`/appointments/api/provider/${providerId}/availability/?date=${date}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.available_slots && data.available_slots.length > 0) {
+                let slotsHtml = '';
+                data.available_slots.forEach(slot => {
+                    slotsHtml += `<span class="time-slot" data-datetime="${slot.datetime}" onclick="selectTimeSlot(this)">${slot.display}</span>`;
+                });
+                slotsContainer.innerHTML = slotsHtml;
+            } else {
+                slotsContainer.innerHTML = '<div class="text-center text-muted">No available slots for this date</div>';
+            }
+        })
+        .catch(error => {
+            slotsContainer.innerHTML = '<div class="text-center text-danger">Error loading time slots</div>';
+        });
+}
+
+function selectTimeSlot(element) {
+    // Remove previous selection
+    document.querySelectorAll('.time-slot').forEach(slot => slot.classList.remove('selected'));
+    
+    // Select current slot
+    element.classList.add('selected');
+    document.getElementById('scheduled_datetime').value = element.dataset.datetime;
+}
+
+function updateSummary() {
+    const providerName = document.querySelector(`input[name="provider_id"]:checked`).closest('.card').querySelector('h6').textContent;
+    const typeName = document.querySelector(`input[name="appointment_type"]:checked`).closest('.card').querySelector('h6').textContent;
+    const datetime = new Date(selectedDateTime);
+    const complaint = document.getElementById('chief_complaint').value;
+    
+    const summaryHtml = `
+        <p><strong>Provider:</strong> ${providerName}</p>
+        <p><strong>Type:</strong> ${typeName}</p>
+        <p><strong>Date & Time:</strong> ${datetime.toLocaleDateString()} at ${datetime.toLocaleTimeString()}</p>
+        <p><strong>Main Concern:</strong> ${complaint}</p>
+    `;
+    
+    document.getElementById('appointment_summary').innerHTML = summaryHtml;
+}
+
+// Handle provider selection
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.provider-card').forEach(card => {
+        card.addEventListener('click', function() {
+            document.querySelectorAll('.provider-card').forEach(c => c.classList.remove('selected'));
+            this.classList.add('selected');
+            this.querySelector('input[type="radio"]').checked = true;
+        });
+    });
+    
+    document.querySelectorAll('.appointment-type-card').forEach(card => {
+        card.addEventListener('click', function() {
+            document.querySelectorAll('.appointment-type-card').forEach(c => c.classList.remove('selected'));
+            this.classList.add('selected');
+            this.querySelector('input[type="radio"]').checked = true;
+        });
+    });
+});
+</script>
+{% endblock %}

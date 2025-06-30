@@ -1,0 +1,264 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}News & Blog - Telehealth Diabetes Care{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Hero Section -->
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h1 class="display-4 text-primary mb-4">
+                <i class="fas fa-newspaper me-3"></i>
+                Diabetes News & Updates
+            </h1>
+            <p class="lead">Stay informed with the latest diabetes research, tips, and community stories</p>
+        </div>
+    </div>
+
+    <!-- Featured Article -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-lg">
+                <div class="row g-0">
+                    <div class="col-md-6">
+                        <div class="bg-primary rounded-start" style="height: 300px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-microscope fa-5x text-white"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card-body p-4">
+                            <span class="badge bg-primary mb-2">Featured</span>
+                            <h3 class="card-title">Breakthrough in Continuous Glucose Monitoring</h3>
+                            <p class="card-text">New research shows significant improvements in diabetes management with latest CGM technology. Patients report better glucose control and quality of life.</p>
+                            <p class="card-text">
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar me-1"></i>December 28, 2024
+                                    <i class="fas fa-user ms-3 me-1"></i>Dr. Sarah Johnson
+                                </small>
+                            </p>
+                            <a href="#" class="btn btn-primary">Read More</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Categories -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="text-primary mb-4">Browse by Category</h2>
+            <div class="d-flex flex-wrap gap-2 mb-4">
+                <a href="#" class="btn btn-outline-primary active">All</a>
+                <a href="#" class="btn btn-outline-primary">Research</a>
+                <a href="#" class="btn btn-outline-primary">Nutrition</a>
+                <a href="#" class="btn btn-outline-primary">Technology</a>
+                <a href="#" class="btn btn-outline-primary">Patient Stories</a>
+                <a href="#" class="btn btn-outline-primary">Tips & Advice</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Articles Grid -->
+    <div class="row">
+        <!-- Article 1 -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="bg-success rounded-top" style="height: 200px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-apple-alt fa-3x text-white"></i>
+                </div>
+                <div class="card-body">
+                    <span class="badge bg-success mb-2">Nutrition</span>
+                    <h5 class="card-title">10 Diabetes-Friendly Holiday Recipes</h5>
+                    <p class="card-text">Enjoy the holidays without compromising your blood sugar control with these delicious and healthy recipes.</p>
+                    <p class="card-text">
+                        <small class="text-muted">
+                            <i class="fas fa-calendar me-1"></i>December 25, 2024
+                        </small>
+                    </p>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="#" class="btn btn-outline-success btn-sm">Read More</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Article 2 -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="bg-info rounded-top" style="height: 200px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-mobile-alt fa-3x text-white"></i>
+                </div>
+                <div class="card-body">
+                    <span class="badge bg-info mb-2">Technology</span>
+                    <h5 class="card-title">Best Diabetes Apps for 2025</h5>
+                    <p class="card-text">Discover the top mobile apps that can help you manage your diabetes more effectively in the new year.</p>
+                    <p class="card-text">
+                        <small class="text-muted">
+                            <i class="fas fa-calendar me-1"></i>December 22, 2024
+                        </small>
+                    </p>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="#" class="btn btn-outline-info btn-sm">Read More</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Article 3 -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="bg-warning rounded-top" style="height: 200px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-heart fa-3x text-white"></i>
+                </div>
+                <div class="card-body">
+                    <span class="badge bg-warning mb-2">Patient Stories</span>
+                    <h5 class="card-title">Sarah's Journey: From Diagnosis to Thriving</h5>
+                    <p class="card-text">Read how Sarah transformed her life after her Type 2 diabetes diagnosis and now helps others do the same.</p>
+                    <p class="card-text">
+                        <small class="text-muted">
+                            <i class="fas fa-calendar me-1"></i>December 20, 2024
+                        </small>
+                    </p>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="#" class="btn btn-outline-warning btn-sm">Read More</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Article 4 -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="bg-danger rounded-top" style="height: 200px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-running fa-3x text-white"></i>
+                </div>
+                <div class="card-body">
+                    <span class="badge bg-danger mb-2">Tips & Advice</span>
+                    <h5 class="card-title">Winter Exercise Tips for Diabetics</h5>
+                    <p class="card-text">Stay active during the cold months with these safe and effective exercise strategies for people with diabetes.</p>
+                    <p class="card-text">
+                        <small class="text-muted">
+                            <i class="fas fa-calendar me-1"></i>December 18, 2024
+                        </small>
+                    </p>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="#" class="btn btn-outline-danger btn-sm">Read More</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Article 5 -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="bg-purple rounded-top" style="height: 200px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-flask fa-3x text-white"></i>
+                </div>
+                <div class="card-body">
+                    <span class="badge bg-purple mb-2">Research</span>
+                    <h5 class="card-title">New Study on Diabetes Prevention</h5>
+                    <p class="card-text">Latest research reveals promising strategies for preventing Type 2 diabetes in high-risk populations.</p>
+                    <p class="card-text">
+                        <small class="text-muted">
+                            <i class="fas fa-calendar me-1"></i>December 15, 2024
+                        </small>
+                    </p>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="#" class="btn btn-outline-purple btn-sm">Read More</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Article 6 -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="bg-dark rounded-top" style="height: 200px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-brain fa-3x text-white"></i>
+                </div>
+                <div class="card-body">
+                    <span class="badge bg-dark mb-2">Mental Health</span>
+                    <h5 class="card-title">Managing Diabetes Burnout</h5>
+                    <p class="card-text">Recognize the signs of diabetes burnout and learn effective strategies to regain motivation and control.</p>
+                    <p class="card-text">
+                        <small class="text-muted">
+                            <i class="fas fa-calendar me-1"></i>December 12, 2024
+                        </small>
+                    </p>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="#" class="btn btn-outline-dark btn-sm">Read More</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <nav aria-label="Blog pagination">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1">Previous</a>
+                    </li>
+                    <li class="page-item active">
+                        <a class="page-link" href="#">1</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">2</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">3</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">Next</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Newsletter Signup -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-lg bg-primary text-white">
+                <div class="card-body p-5 text-center">
+                    <h2 class="mb-4">Stay Updated</h2>
+                    <p class="lead mb-4">Subscribe to our newsletter for the latest diabetes news, tips, and research updates.</p>
+                    <div class="row justify-content-center">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <input type="email" class="form-control" placeholder="Enter your email">
+                                <button class="btn btn-light" type="button">
+                                    <i class="fas fa-paper-plane me-1"></i>
+                                    Subscribe
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.bg-purple {
+    background-color: #6f42c1 !important;
+}
+.badge.bg-purple {
+    background-color: #6f42c1 !important;
+}
+.btn-outline-purple {
+    color: #6f42c1;
+    border-color: #6f42c1;
+}
+.btn-outline-purple:hover {
+    background-color: #6f42c1;
+    border-color: #6f42c1;
+    color: white;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,376 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Support Groups - Telehealth Diabetes Care{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Hero Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="bg-gradient-community text-white rounded-3 p-5 text-center">
+                <h1 class="display-4 fw-bold mb-3">
+                    <i class="fas fa-users me-3"></i>
+                    Diabetes Support Community
+                </h1>
+                <p class="lead mb-4">
+                    Connect with others on similar journeys, share experiences, and find support
+                </p>
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    <a href="{% url 'support_groups:list' %}" class="btn btn-light btn-lg">
+                        <i class="fas fa-search me-2"></i>Find Groups
+                    </a>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'support_groups:my_groups' %}" class="btn btn-outline-light btn-lg">
+                            <i class="fas fa-user-friends me-2"></i>My Groups
+                        </a>
+                        <a href="{% url 'support_groups:create' %}" class="btn btn-outline-light btn-lg">
+                            <i class="fas fa-plus me-2"></i>Create Group
+                        </a>
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}" class="btn btn-outline-light btn-lg">
+                            <i class="fas fa-sign-in-alt me-2"></i>Join Community
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User's Groups Dashboard -->
+    {% if user.is_authenticated and user_groups %}
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-user-friends me-2 text-primary"></i>
+                            My Support Groups
+                        </h5>
+                        <a href="{% url 'support_groups:my_groups' %}" class="btn btn-sm btn-outline-primary">
+                            View All
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for group in user_groups %}
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-start border-primary border-3">
+                                <div class="card-body">
+                                    <h6 class="card-title mb-1">{{ group.name }}</h6>
+                                    <p class="text-muted mb-2">{{ group.description|truncatewords:10 }}</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">
+                                            <i class="fas fa-users me-1"></i>
+                                            {{ group.memberships.count }} members
+                                        </small>
+                                        <a href="{% url 'support_groups:detail' group.id %}" class="btn btn-sm btn-primary">
+                                            Visit
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Recent Activity -->
+    {% if user.is_authenticated and recent_posts %}
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-comments me-2 text-success"></i>
+                        Recent Activity from Your Groups
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% for post in recent_posts %}
+                    <div class="d-flex align-items-start mb-3 pb-3 border-bottom">
+                        <div class="me-3">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                <i class="fas fa-user"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1">
+                                <a href="{% url 'support_groups:post_detail' post.group.id post.id %}" class="text-decoration-none">
+                                    {{ post.title }}
+                                </a>
+                            </h6>
+                            <p class="text-muted mb-1">{{ post.content|truncatewords:20 }}</p>
+                            <small class="text-muted">
+                                by {{ post.author.user.get_full_name|default:post.author.user.username }} 
+                                in {{ post.group.name }} • {{ post.created_at|timesince }} ago
+                            </small>
+                        </div>
+                        <div>
+                            <span class="badge bg-secondary">{{ post.get_post_type_display }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Featured Groups -->
+            {% if featured_groups %}
+            <div class="row mb-5">
+                <div class="col-12">
+                    <h2 class="h3 text-primary mb-4">
+                        <i class="fas fa-star me-2"></i>
+                        Featured Support Groups
+                    </h2>
+                </div>
+                {% for group in featured_groups %}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 border-0 shadow-sm featured-group-card">
+                        {% if group.image %}
+                        <img src="{{ group.image.url }}" class="card-img-top" alt="{{ group.name }}" style="height: 200px; object-fit: cover;">
+                        {% else %}
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                            <i class="fas fa-users fa-3x text-muted"></i>
+                        </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-primary">{{ group.get_category_display }}</span>
+                                <span class="badge bg-warning">Featured</span>
+                            </div>
+                            <h5 class="card-title">{{ group.name }}</h5>
+                            <p class="card-text text-muted">{{ group.description|truncatewords:20 }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    <i class="fas fa-users me-1"></i>
+                                    {{ group.member_count|default:0 }} members
+                                </small>
+                                <a href="{% url 'support_groups:detail' group.id %}" class="btn btn-primary">
+                                    Join Group
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Popular Groups -->
+            {% if popular_groups %}
+            <div class="row mb-5">
+                <div class="col-12">
+                    <h2 class="h3 text-primary mb-4">
+                        <i class="fas fa-fire me-2"></i>
+                        Popular Support Groups
+                    </h2>
+                </div>
+                {% for group in popular_groups %}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 border-0 shadow-sm group-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-secondary">{{ group.get_category_display }}</span>
+                                <span class="badge bg-success">{{ group.member_count }} members</span>
+                            </div>
+                            <h5 class="card-title">{{ group.name }}</h5>
+                            <p class="card-text text-muted">{{ group.description|truncatewords:15 }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    Created {{ group.created_at|timesince }} ago
+                                </small>
+                                <a href="{% url 'support_groups:detail' group.id %}" class="btn btn-outline-primary">
+                                    View Group
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Community Guidelines -->
+            <div class="row mb-5">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white border-0">
+                            <h5 class="mb-0">
+                                <i class="fas fa-shield-alt me-2 text-info"></i>
+                                Community Guidelines
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <h6 class="text-success mb-1">
+                                            <i class="fas fa-check me-1"></i>Be Respectful
+                                        </h6>
+                                        <small class="text-muted">Treat all members with kindness and respect</small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6 class="text-success mb-1">
+                                            <i class="fas fa-check me-1"></i>Share Experiences
+                                        </h6>
+                                        <small class="text-muted">Your story can help and inspire others</small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6 class="text-success mb-1">
+                                            <i class="fas fa-check me-1"></i>Stay On Topic
+                                        </h6>
+                                        <small class="text-muted">Keep discussions relevant to diabetes management</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <h6 class="text-warning mb-1">
+                                            <i class="fas fa-exclamation-triangle me-1"></i>No Medical Advice
+                                        </h6>
+                                        <small class="text-muted">Share experiences, not medical recommendations</small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6 class="text-warning mb-1">
+                                            <i class="fas fa-exclamation-triangle me-1"></i>Protect Privacy
+                                        </h6>
+                                        <small class="text-muted">Don't share personal medical information</small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6 class="text-warning mb-1">
+                                            <i class="fas fa-exclamation-triangle me-1"></i>Report Issues
+                                        </h6>
+                                        <small class="text-muted">Contact moderators if you see inappropriate content</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Quick Actions -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bolt me-2 text-primary"></i>
+                        Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'support_groups:list' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-search me-2"></i>Browse All Groups
+                        </a>
+                        {% if user.is_authenticated %}
+                        <a href="{% url 'support_groups:create' %}" class="btn btn-outline-success">
+                            <i class="fas fa-plus me-2"></i>Create New Group
+                        </a>
+                        <a href="{% url 'support_groups:my_groups' %}" class="btn btn-outline-info">
+                            <i class="fas fa-user-friends me-2"></i>My Groups
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'support_groups:qa_sessions' %}" class="btn btn-outline-warning">
+                            <i class="fas fa-question-circle me-2"></i>Q&A Sessions
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Group Categories -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-tags me-2 text-success"></i>
+                        Group Categories
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-2">
+                        <a href="{% url 'support_groups:list' %}?category=type1" class="text-decoration-none">
+                            <i class="fas fa-circle text-primary me-2"></i>Type 1 Diabetes
+                        </a>
+                    </div>
+                    <div class="mb-2">
+                        <a href="{% url 'support_groups:list' %}?category=type2" class="text-decoration-none">
+                            <i class="fas fa-circle text-success me-2"></i>Type 2 Diabetes
+                        </a>
+                    </div>
+                    <div class="mb-2">
+                        <a href="{% url 'support_groups:list' %}?category=newly_diagnosed" class="text-decoration-none">
+                            <i class="fas fa-circle text-info me-2"></i>Newly Diagnosed
+                        </a>
+                    </div>
+                    <div class="mb-2">
+                        <a href="{% url 'support_groups:list' %}?category=caregivers" class="text-decoration-none">
+                            <i class="fas fa-circle text-warning me-2"></i>Caregivers & Family
+                        </a>
+                    </div>
+                    <div class="mb-2">
+                        <a href="{% url 'support_groups:list' %}?category=teens_young_adults" class="text-decoration-none">
+                            <i class="fas fa-circle text-danger me-2"></i>Teens & Young Adults
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Support Tips -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-lightbulb me-2 text-warning"></i>
+                        Community Tips
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6 class="mb-1">Be Active</h6>
+                        <small class="text-muted">Regular participation helps build stronger connections</small>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="mb-1">Ask Questions</h6>
+                        <small class="text-muted">Don't hesitate to seek advice from experienced members</small>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="mb-1">Share Your Journey</h6>
+                        <small class="text-muted">Your experiences can help others facing similar challenges</small>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="mb-1">Stay Positive</h6>
+                        <small class="text-muted">Focus on encouragement and constructive support</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.bg-gradient-community {
+    background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);
+}
+
+.featured-group-card, .group-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.featured-group-card:hover, .group-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+</style>
+{% endblock %}

@@ -1,0 +1,425 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Diabetes-Friendly Recipes - Telehealth Diabetes Care{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Hero Section -->
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h1 class="display-4 text-primary mb-4">
+                <i class="fas fa-utensils me-3"></i>
+                Diabetes-Friendly Recipes
+            </h1>
+            <p class="lead">Delicious, healthy recipes designed for diabetes management</p>
+        </div>
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search recipes...">
+                <button class="btn btn-primary" type="button">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <select class="form-select">
+                <option value="">All Meal Types</option>
+                <option value="breakfast">Breakfast</option>
+                <option value="lunch">Lunch</option>
+                <option value="dinner">Dinner</option>
+                <option value="snack">Snacks</option>
+                <option value="dessert">Desserts</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select class="form-select">
+                <option value="">All Dietary Needs</option>
+                <option value="low_carb">Low Carb</option>
+                <option value="vegetarian">Vegetarian</option>
+                <option value="vegan">Vegan</option>
+                <option value="gluten_free">Gluten-Free</option>
+                <option value="heart_healthy">Heart Healthy</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Featured Recipe -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-lg">
+                <div class="row g-0">
+                    <div class="col-md-6">
+                        <div class="bg-success rounded-start d-flex align-items-center justify-content-center" style="height: 300px;">
+                            <i class="fas fa-fish fa-5x text-white"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card-body p-4">
+                            <span class="badge bg-success mb-2">Featured Recipe</span>
+                            <h3 class="card-title">Grilled Salmon with Quinoa Salad</h3>
+                            <p class="card-text">A heart-healthy, diabetes-friendly meal packed with omega-3 fatty acids and fiber. Perfect for lunch or dinner.</p>
+                            
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock me-1"></i>30 minutes
+                                    </small>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted">
+                                        <i class="fas fa-users me-1"></i>4 servings
+                                    </small>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <span class="badge bg-primary me-1">Low Carb</span>
+                                <span class="badge bg-info me-1">Heart Healthy</span>
+                                <span class="badge bg-success">High Protein</span>
+                            </div>
+                            
+                            <a href="#" class="btn btn-success">View Recipe</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recipe Categories -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="text-primary mb-4">Browse by Category</h2>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="bg-warning rounded-top d-flex align-items-center justify-content-center" style="height: 150px;">
+                    <i class="fas fa-coffee fa-3x text-white"></i>
+                </div>
+                <div class="card-body text-center">
+                    <h5 class="card-title">Breakfast</h5>
+                    <p class="card-text">Start your day right with diabetes-friendly breakfast options.</p>
+                    <a href="#" class="btn btn-outline-warning">View Recipes</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="bg-success rounded-top d-flex align-items-center justify-content-center" style="height: 150px;">
+                    <i class="fas fa-leaf fa-3x text-white"></i>
+                </div>
+                <div class="card-body text-center">
+                    <h5 class="card-title">Lunch</h5>
+                    <p class="card-text">Nutritious and satisfying lunch recipes to fuel your day.</p>
+                    <a href="#" class="btn btn-outline-success">View Recipes</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="bg-primary rounded-top d-flex align-items-center justify-content-center" style="height: 150px;">
+                    <i class="fas fa-drumstick-bite fa-3x text-white"></i>
+                </div>
+                <div class="card-body text-center">
+                    <h5 class="card-title">Dinner</h5>
+                    <p class="card-text">Delicious dinner recipes that won't spike your blood sugar.</p>
+                    <a href="#" class="btn btn-outline-primary">View Recipes</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="bg-info rounded-top d-flex align-items-center justify-content-center" style="height: 150px;">
+                    <i class="fas fa-cookie-bite fa-3x text-white"></i>
+                </div>
+                <div class="card-body text-center">
+                    <h5 class="card-title">Snacks & Desserts</h5>
+                    <p class="card-text">Healthy snacks and guilt-free desserts for any time.</p>
+                    <a href="#" class="btn btn-outline-info">View Recipes</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popular Recipes -->
+    <div class="row">
+        <div class="col-12">
+            <h2 class="text-primary mb-4">Popular Recipes</h2>
+        </div>
+        
+        <!-- Recipe 1 -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="bg-danger rounded-top d-flex align-items-center justify-content-center" style="height: 200px;">
+                    <i class="fas fa-pepper-hot fa-3x text-white"></i>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Spicy Chicken Stir-Fry</h5>
+                    <p class="card-text">Quick and easy low-carb dinner with plenty of vegetables and lean protein.</p>
+                    
+                    <div class="row mb-2">
+                        <div class="col-6">
+                            <small class="text-muted">
+                                <i class="fas fa-clock me-1"></i>20 mins
+                            </small>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">
+                                <i class="fas fa-chart-line me-1"></i>Low GI
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <span class="badge bg-danger me-1">Dinner</span>
+                        <span class="badge bg-primary">Low Carb</span>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="#" class="btn btn-outline-danger btn-sm">View Recipe</a>
+                    <button class="btn btn-outline-secondary btn-sm float-end">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recipe 2 -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="bg-success rounded-top d-flex align-items-center justify-content-center" style="height: 200px;">
+                    <i class="fas fa-seedling fa-3x text-white"></i>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Mediterranean Quinoa Bowl</h5>
+                    <p class="card-text">Nutrient-packed vegetarian meal with quinoa, vegetables, and healthy fats.</p>
+                    
+                    <div class="row mb-2">
+                        <div class="col-6">
+                            <small class="text-muted">
+                                <i class="fas fa-clock me-1"></i>25 mins
+                            </small>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">
+                                <i class="fas fa-chart-line me-1"></i>Medium GI
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <span class="badge bg-success me-1">Lunch</span>
+                        <span class="badge bg-info">Vegetarian</span>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="#" class="btn btn-outline-success btn-sm">View Recipe</a>
+                    <button class="btn btn-outline-secondary btn-sm float-end">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recipe 3 -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="bg-warning rounded-top d-flex align-items-center justify-content-center" style="height: 200px;">
+                    <i class="fas fa-egg fa-3x text-white"></i>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Veggie Scrambled Eggs</h5>
+                    <p class="card-text">Protein-rich breakfast loaded with colorful vegetables and herbs.</p>
+                    
+                    <div class="row mb-2">
+                        <div class="col-6">
+                            <small class="text-muted">
+                                <i class="fas fa-clock me-1"></i>15 mins
+                            </small>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">
+                                <i class="fas fa-chart-line me-1"></i>Low GI
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <span class="badge bg-warning me-1">Breakfast</span>
+                        <span class="badge bg-primary">Low Carb</span>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="#" class="btn btn-outline-warning btn-sm">View Recipe</a>
+                    <button class="btn btn-outline-secondary btn-sm float-end">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recipe 4 -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="bg-info rounded-top d-flex align-items-center justify-content-center" style="height: 200px;">
+                    <i class="fas fa-apple-alt fa-3x text-white"></i>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Sugar-Free Apple Crisp</h5>
+                    <p class="card-text">Guilt-free dessert sweetened naturally with stevia and cinnamon.</p>
+                    
+                    <div class="row mb-2">
+                        <div class="col-6">
+                            <small class="text-muted">
+                                <i class="fas fa-clock me-1"></i>45 mins
+                            </small>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">
+                                <i class="fas fa-chart-line me-1"></i>Low GI
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <span class="badge bg-info me-1">Dessert</span>
+                        <span class="badge bg-success">Sugar-Free</span>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="#" class="btn btn-outline-info btn-sm">View Recipe</a>
+                    <button class="btn btn-outline-secondary btn-sm float-end">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recipe 5 -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="bg-purple rounded-top d-flex align-items-center justify-content-center" style="height: 200px;">
+                    <i class="fas fa-carrot fa-3x text-white"></i>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Roasted Vegetable Soup</h5>
+                    <p class="card-text">Warming, fiber-rich soup perfect for blood sugar management.</p>
+                    
+                    <div class="row mb-2">
+                        <div class="col-6">
+                            <small class="text-muted">
+                                <i class="fas fa-clock me-1"></i>40 mins
+                            </small>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">
+                                <i class="fas fa-chart-line me-1"></i>Low GI
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <span class="badge bg-purple me-1">Lunch</span>
+                        <span class="badge bg-success">Vegan</span>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="#" class="btn btn-outline-purple btn-sm">View Recipe</a>
+                    <button class="btn btn-outline-secondary btn-sm float-end">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recipe 6 -->
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="bg-dark rounded-top d-flex align-items-center justify-content-center" style="height: 200px;">
+                    <i class="fas fa-cheese fa-3x text-white"></i>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Almond Flour Crackers</h5>
+                    <p class="card-text">Crunchy, low-carb snack perfect for pairing with healthy dips.</p>
+                    
+                    <div class="row mb-2">
+                        <div class="col-6">
+                            <small class="text-muted">
+                                <i class="fas fa-clock me-1"></i>30 mins
+                            </small>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">
+                                <i class="fas fa-chart-line me-1"></i>Low GI
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <span class="badge bg-dark me-1">Snack</span>
+                        <span class="badge bg-warning">Gluten-Free</span>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="#" class="btn btn-outline-dark btn-sm">View Recipe</a>
+                    <button class="btn btn-outline-secondary btn-sm float-end">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nutrition Tips -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-lg bg-primary text-white">
+                <div class="card-body p-5">
+                    <h2 class="text-center mb-4">Cooking Tips for Diabetes</h2>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <h5><i class="fas fa-check me-2"></i>Choose Whole Grains</h5>
+                            <p>Opt for brown rice, quinoa, and whole wheat pasta for better blood sugar control.</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h5><i class="fas fa-check me-2"></i>Load Up on Vegetables</h5>
+                            <p>Fill half your plate with non-starchy vegetables for fiber and nutrients.</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h5><i class="fas fa-check me-2"></i>Use Healthy Fats</h5>
+                            <p>Include olive oil, avocados, and nuts for heart-healthy monounsaturated fats.</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h5><i class="fas fa-check me-2"></i>Watch Portion Sizes</h5>
+                            <p>Use the plate method: 1/2 vegetables, 1/4 protein, 1/4 healthy carbs.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.bg-purple {
+    background-color: #6f42c1 !important;
+}
+.badge.bg-purple {
+    background-color: #6f42c1 !important;
+}
+.btn-outline-purple {
+    color: #6f42c1;
+    border-color: #6f42c1;
+}
+.btn-outline-purple:hover {
+    background-color: #6f42c1;
+    border-color: #6f42c1;
+    color: white;
+}
+</style>
+{% endblock %}

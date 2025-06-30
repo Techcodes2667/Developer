@@ -11,17 +11,17 @@
             <div class="col-lg-6">
                 <h1 class="display-4 fw-bold mb-4">
                     <i class="fas fa-heartbeat me-3"></i>
-                    Diabetes Care at Your Fingertips
+                    {{ hero_title }}
                 </h1>
                 <p class="lead mb-4">
-                    Connect with healthcare professionals, monitor your health, and manage your diabetes 
-                    from the comfort of your home with our comprehensive telehealth platform.
+                    {{ hero_subtitle }}. Connect with healthcare professionals, monitor your health,
+                    and manage your diabetes from anywhere in Kisumu and beyond.
                 </p>
                 <div class="d-flex gap-3">
                     <a href="{% url 'appointments:schedule' %}" class="btn btn-light btn-lg">
                         <i class="fas fa-calendar-plus me-2"></i>Schedule Consultation
                     </a>
-                    <a href="{% url 'education:about_diabetes' %}" class="btn btn-outline-light btn-lg">
+                    <a href="{% url 'main:diabetes_info_hub' %}" class="btn btn-outline-light btn-lg">
                         <i class="fas fa-book-medical me-2"></i>Learn More
                     </a>
                 </div>
@@ -78,7 +78,7 @@
                         </div>
                         <h4 class="card-title text-info">Educational Resources</h4>
                         <p class="card-text">Access comprehensive guides, meal plans, and exercise routines tailored for diabetes.</p>
-                        <a href="{% url 'education:about_diabetes' %}" class="btn btn-outline-info">Learn More</a>
+                        <a href="{% url 'education:home' %}" class="btn btn-outline-info">Learn More</a>
                     </div>
                 </div>
             </div>

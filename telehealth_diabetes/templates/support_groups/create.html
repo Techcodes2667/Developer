@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create Support Group - Telehealth Diabetes Care{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-primary text-white text-center">
+                    <h2 class="mb-0">
+                        <i class="fas fa-users me-2"></i>
+                        Create Support Group
+                    </h2>
+                </div>
+                <div class="card-body p-5">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <!-- Group Name -->
+                        <div class="mb-4">
+                            <label for="name" class="form-label">
+                                <i class="fas fa-tag me-2"></i>Group Name *
+                            </label>
+                            <input type="text" class="form-control" id="name" name="name" required 
+                                   placeholder="e.g., Kisumu Type 2 Support Group">
+                            <div class="form-text">Choose a clear, descriptive name for your group</div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-4">
+                            <label for="description" class="form-label">
+                                <i class="fas fa-align-left me-2"></i>Description *
+                            </label>
+                            <textarea class="form-control" id="description" name="description" rows="4" required
+                                      placeholder="Describe the purpose and goals of your support group..."></textarea>
+                            <div class="form-text">Explain what your group is about and what members can expect</div>
+                        </div>
+
+                        <!-- Group Type -->
+                        <div class="mb-4">
+                            <label for="group_type" class="form-label">
+                                <i class="fas fa-list me-2"></i>Group Type *
+                            </label>
+                            <select class="form-select" id="group_type" name="group_type" required>
+                                <option value="">Select group type...</option>
+                                {% for value, label in group_types %}
+                                    <option value="{{ value }}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">Choose the category that best fits your group</div>
+                        </div>
+
+                        <!-- Location -->
+                        <div class="mb-4">
+                            <label for="location" class="form-label">
+                                <i class="fas fa-map-marker-alt me-2"></i>Location (Optional)
+                            </label>
+                            <input type="text" class="form-control" id="location" name="location" 
+                                   placeholder="e.g., Kisumu, Kenya">
+                            <div class="form-text">Specify if this is a location-based group</div>
+                        </div>
+
+                        <!-- Group Settings -->
+                        <div class="mb-4">
+                            <label class="form-label">
+                                <i class="fas fa-cog me-2"></i>Group Settings
+                            </label>
+                            
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="is_public" name="is_public" checked>
+                                <label class="form-check-label" for="is_public">
+                                    <strong>Public Group</strong>
+                                    <div class="form-text">Anyone can see and join this group</div>
+                                </label>
+                            </div>
+                            
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="requires_approval" name="requires_approval">
+                                <label class="form-check-label" for="requires_approval">
+                                    <strong>Require Approval</strong>
+                                    <div class="form-text">New members must be approved before joining</div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Guidelines -->
+                        <div class="mb-4">
+                            <label for="guidelines" class="form-label">
+                                <i class="fas fa-gavel me-2"></i>Group Guidelines (Optional)
+                            </label>
+                            <textarea class="form-control" id="guidelines" name="guidelines" rows="3"
+                                      placeholder="Set community guidelines and rules for your group..."></textarea>
+                            <div class="form-text">Establish rules to maintain a supportive environment</div>
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'support_groups:list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Create Group
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tips Section -->
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-lightbulb me-2"></i>Tips for Creating a Successful Support Group
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            <strong>Be specific:</strong> Clearly define your group's purpose and target audience
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            <strong>Set guidelines:</strong> Establish clear rules to maintain a supportive environment
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            <strong>Stay active:</strong> Regular engagement helps build a strong community
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            <strong>Be welcoming:</strong> Create an inclusive space for all members
+                        </li>
+                        <li class="mb-0">
+                            <i class="fas fa-check text-success me-2"></i>
+                            <strong>Moderate fairly:</strong> Ensure discussions remain respectful and on-topic
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Toggle approval requirement based on public/private setting
+    const isPublicCheckbox = document.getElementById('is_public');
+    const requiresApprovalCheckbox = document.getElementById('requires_approval');
+    
+    isPublicCheckbox.addEventListener('change', function() {
+        if (!this.checked) {
+            requiresApprovalCheckbox.checked = true;
+            requiresApprovalCheckbox.disabled = true;
+        } else {
+            requiresApprovalCheckbox.disabled = false;
+        }
+    });
+});
+</script>
+{% endblock %}

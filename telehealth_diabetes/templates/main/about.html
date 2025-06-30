@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About Us - Telehealth Diabetes Care{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Hero Section -->
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h1 class="display-4 text-primary mb-4">
+                <i class="fas fa-heartbeat me-3"></i>
+                About DiabetesCare
+            </h1>
+            <p class="lead">Empowering diabetes management through innovative telehealth solutions</p>
+        </div>
+    </div>
+
+    <!-- Mission Section -->
+    <div class="row mb-5">
+        <div class="col-lg-6">
+            <h2 class="text-primary mb-4">Our Mission</h2>
+            <p class="lead">To provide accessible, comprehensive, and personalized diabetes care through cutting-edge telehealth technology, empowering patients to take control of their health journey.</p>
+            <p>We believe that quality diabetes care should be available to everyone, regardless of location or circumstances. Our platform bridges the gap between patients and healthcare providers, making diabetes management more convenient, effective, and engaging.</p>
+        </div>
+        <div class="col-lg-6">
+            <img src="{% static 'images/about-mission.jpg' %}" alt="Our Mission" class="img-fluid rounded shadow" style="min-height: 300px; object-fit: cover; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        </div>
+    </div>
+
+    <!-- Values Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="text-center text-primary mb-5">Our Core Values</h2>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-heart fa-3x text-danger mb-3"></i>
+                    <h5 class="card-title">Patient-Centered Care</h5>
+                    <p class="card-text">Every decision we make is guided by what's best for our patients' health and well-being.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-shield-alt fa-3x text-success mb-3"></i>
+                    <h5 class="card-title">Privacy & Security</h5>
+                    <p class="card-text">We maintain the highest standards of data protection and patient confidentiality.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-lightbulb fa-3x text-warning mb-3"></i>
+                    <h5 class="card-title">Innovation</h5>
+                    <p class="card-text">We continuously evolve our platform to incorporate the latest in diabetes care technology.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Team Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="text-center text-primary mb-5">Our Team</h2>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="rounded-circle bg-primary mx-auto mb-3" style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-user-md fa-2x text-white"></i>
+                    </div>
+                    <h5 class="card-title">Dr. Sarah Johnson</h5>
+                    <p class="text-muted">Chief Medical Officer</p>
+                    <p class="card-text small">Endocrinologist with 15+ years of diabetes care experience.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="rounded-circle bg-success mx-auto mb-3" style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-laptop-code fa-2x text-white"></i>
+                    </div>
+                    <h5 class="card-title">Michael Chen</h5>
+                    <p class="text-muted">Chief Technology Officer</p>
+                    <p class="card-text small">Healthcare technology expert focused on patient-centered solutions.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="rounded-circle bg-info mx-auto mb-3" style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-graduation-cap fa-2x text-white"></i>
+                    </div>
+                    <h5 class="card-title">Dr. Emily Rodriguez</h5>
+                    <p class="text-muted">Director of Education</p>
+                    <p class="card-text small">Certified diabetes educator and nutrition specialist.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="rounded-circle bg-warning mx-auto mb-3" style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-users fa-2x text-white"></i>
+                    </div>
+                    <h5 class="card-title">James Wilson</h5>
+                    <p class="text-muted">Patient Advocate</p>
+                    <p class="card-text small">Living with Type 1 diabetes for 20+ years, passionate about patient support.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="bg-primary text-white rounded p-5">
+                <h2 class="text-center mb-5">Our Impact</h2>
+                <div class="row text-center">
+                    <div class="col-md-3 mb-3">
+                        <h3 class="display-4">5,000+</h3>
+                        <p class="lead">Patients Served</p>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <h3 class="display-4">98%</h3>
+                        <p class="lead">Patient Satisfaction</p>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <h3 class="display-4">24/7</h3>
+                        <p class="lead">Support Available</p>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <h3 class="display-4">15%</h3>
+                        <p class="lead">Average HbA1c Improvement</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Section -->
+    <div class="row">
+        <div class="col-12 text-center">
+            <h2 class="text-primary mb-4">Get in Touch</h2>
+            <p class="lead mb-4">Ready to start your diabetes management journey with us?</p>
+            <div class="row justify-content-center">
+                <div class="col-md-4 mb-3">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-phone fa-2x text-primary mb-3"></i>
+                            <h5>Call Us</h5>
+                            <p>+254 (0) 123-456-789</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-envelope fa-2x text-primary mb-3"></i>
+                            <h5>Email Us</h5>
+                            <p>support@diabetescare.co.ke</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-map-marker-alt fa-2x text-primary mb-3"></i>
+                            <h5>Visit Us</h5>
+                            <p>Kisumu, Kenya</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4">
+                <a href="{% url 'main:register' %}" class="btn btn-primary btn-lg me-3">
+                    <i class="fas fa-user-plus me-2"></i>
+                    Get Started Today
+                </a>
+                <a href="{% url 'main:contact' %}" class="btn btn-outline-primary btn-lg">
+                    <i class="fas fa-envelope me-2"></i>
+                    Contact Us
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

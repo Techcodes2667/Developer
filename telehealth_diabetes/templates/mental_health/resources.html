@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mental Health Resources - Telehealth Diabetes Care{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-book text-primary me-2"></i>
+                        Mental Health Resources
+                    </h1>
+                    <p class="text-muted mb-0">Educational materials and support resources</p>
+                </div>
+                <a href="{% url 'mental_health:dashboard' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-chart-line me-2"></i>View Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Options -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title">Filter by Topic:</h6>
+                    <div class="btn-group flex-wrap" role="group">
+                        <a href="{% url 'mental_health:resources' %}" 
+                           class="btn {% if not selected_topic %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                            All Topics
+                        </a>
+                        <a href="{% url 'mental_health:resources' %}?topic=anxiety" 
+                           class="btn {% if selected_topic == 'anxiety' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                            Anxiety
+                        </a>
+                        <a href="{% url 'mental_health:resources' %}?topic=depression" 
+                           class="btn {% if selected_topic == 'depression' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                            Depression
+                        </a>
+                        <a href="{% url 'mental_health:resources' %}?topic=stress" 
+                           class="btn {% if selected_topic == 'stress' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                            Stress Management
+                        </a>
+                        <a href="{% url 'mental_health:resources' %}?topic=diabetes" 
+                           class="btn {% if selected_topic == 'diabetes' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                            Diabetes & Mental Health
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resources Grid -->
+    <div class="row">
+        {% if resources %}
+            {% for resource in resources %}
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="card-title">{{ resource.title }}</h5>
+                                <span class="badge bg-primary">{{ resource.get_topic_display }}</span>
+                            </div>
+                            <p class="card-text">{{ resource.description|truncatewords:25 }}</p>
+                            <div class="mb-3">
+                                <small class="text-muted">
+                                    <i class="fas fa-user me-1"></i>{{ resource.author }}
+                                </small>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            {% if resource.external_url %}
+                                <a href="{{ resource.external_url }}" target="_blank" 
+                                   class="btn btn-outline-primary w-100">
+                                    <i class="fas fa-external-link-alt me-2"></i>Read More
+                                </a>
+                            {% else %}
+                                <button class="btn btn-outline-secondary w-100" disabled>
+                                    <i class="fas fa-file-alt me-2"></i>Coming Soon
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="text-center py-5">
+                    <i class="fas fa-book fa-4x text-muted mb-4"></i>
+                    <h4 class="text-muted">No Resources Found</h4>
+                    <p class="text-muted">
+                        {% if selected_topic %}
+                            No resources found for "{{ selected_topic }}". Try a different topic.
+                        {% else %}
+                            Mental health resources will be available soon.
+                        {% endif %}
+                    </p>
+                    <a href="{% url 'mental_health:resources' %}" class="btn btn-primary">
+                        <i class="fas fa-refresh me-2"></i>View All Resources
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Quick Resources -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <h4 class="mb-4">
+                <i class="fas fa-star text-warning me-2"></i>
+                Quick Resources
+            </h4>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-phone fa-2x text-danger mb-3"></i>
+                    <h6>Crisis Support</h6>
+                    <p class="small text-muted">24/7 crisis hotlines and emergency resources</p>
+                    <a href="{% url 'mental_health:crisis_resources' %}" class="btn btn-danger btn-sm">
+                        Get Help Now
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-lightbulb fa-2x text-info mb-3"></i>
+                    <h6>Coping Strategies</h6>
+                    <p class="small text-muted">Practical tips for managing stress and emotions</p>
+                    <a href="{% url 'mental_health:coping_strategies' %}" class="btn btn-info btn-sm">
+                        Learn More
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-smile fa-2x text-success mb-3"></i>
+                    <h6>Mood Tracking</h6>
+                    <p class="small text-muted">Track your daily mood and emotional patterns</p>
+                    <a href="{% url 'mental_health:mood_tracking' %}" class="btn btn-success btn-sm">
+                        Start Tracking
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-clipboard-check fa-2x text-primary mb-3"></i>
+                    <h6>Assessments</h6>
+                    <p class="small text-muted">Self-assessment tools for mental health</p>
+                    <a href="{% url 'mental_health:assessments' %}" class="btn btn-primary btn-sm">
+                        Take Assessment
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,268 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Add Medication - Telehealth Diabetes Care{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">
+                    <i class="fas fa-plus-circle me-2 text-primary"></i>
+                    Add New Medication
+                </h1>
+                <a href="{% url 'medication_management:list' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>Back to Medications
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-pills me-2 text-primary"></i>
+                        Medication Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <!-- Medication Details -->
+                        <div class="row mb-4">
+                            <div class="col-md-8">
+                                <label for="medication_name" class="form-label">Medication Name *</label>
+                                <input type="text" class="form-control" id="medication_name" name="medication_name" 
+                                       list="medication_list" required placeholder="e.g., Metformin, Insulin">
+                                <datalist id="medication_list">
+                                    {% for medication in medications %}
+                                        <option value="{{ medication.name }}">
+                                    {% endfor %}
+                                </datalist>
+                                <div class="form-text">Start typing to see suggestions or enter a new medication name</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="medication_type" class="form-label">Type</label>
+                                <select class="form-select" id="medication_type" name="medication_type">
+                                    <option value="insulin">Insulin</option>
+                                    <option value="metformin">Metformin</option>
+                                    <option value="sulfonylurea">Sulfonylurea</option>
+                                    <option value="dpp4">DPP-4 Inhibitor</option>
+                                    <option value="sglt2">SGLT-2 Inhibitor</option>
+                                    <option value="glp1">GLP-1 Agonist</option>
+                                    <option value="other" selected>Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Dosage and Frequency -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="dosage" class="form-label">Dosage *</label>
+                                <input type="text" class="form-control" id="dosage" name="dosage" required 
+                                       placeholder="e.g., 500mg, 10 units, 1 tablet">
+                                <div class="form-text">Include the amount and unit (mg, units, tablets, etc.)</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="frequency" class="form-label">Frequency *</label>
+                                <select class="form-select" id="frequency" name="frequency" required>
+                                    <option value="">Select frequency</option>
+                                    <option value="Once daily">Once daily</option>
+                                    <option value="Twice daily">Twice daily</option>
+                                    <option value="Three times daily">Three times daily</option>
+                                    <option value="Four times daily">Four times daily</option>
+                                    <option value="Before meals">Before meals</option>
+                                    <option value="After meals">After meals</option>
+                                    <option value="With meals">With meals</option>
+                                    <option value="At bedtime">At bedtime</option>
+                                    <option value="As needed">As needed</option>
+                                    <option value="Every other day">Every other day</option>
+                                    <option value="Weekly">Weekly</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Instructions -->
+                        <div class="mb-4">
+                            <label for="instructions" class="form-label">Special Instructions</label>
+                            <textarea class="form-control" id="instructions" name="instructions" rows="3" 
+                                      placeholder="Any special instructions from your doctor (e.g., take with food, avoid alcohol)"></textarea>
+                        </div>
+
+                        <!-- Prescription Details -->
+                        <h6 class="text-primary mb-3">
+                            <i class="fas fa-user-md me-2"></i>
+                            Prescription Details
+                        </h6>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="prescribed_by" class="form-label">Prescribed By</label>
+                                <input type="text" class="form-control" id="prescribed_by" name="prescribed_by" 
+                                       placeholder="Dr. John Doe">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="start_date" class="form-label">Start Date *</label>
+                                <input type="date" class="form-control" id="start_date" name="start_date" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="end_date" class="form-label">End Date (if applicable)</label>
+                                <input type="date" class="form-control" id="end_date" name="end_date">
+                                <div class="form-text">Leave blank for ongoing medications</div>
+                            </div>
+                        </div>
+
+                        <!-- Reminders -->
+                        <h6 class="text-primary mb-3">
+                            <i class="fas fa-bell me-2"></i>
+                            Set Reminders (Optional)
+                        </h6>
+                        
+                        <div class="mb-4">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="enable_reminders" onchange="toggleReminders()">
+                                <label class="form-check-label" for="enable_reminders">
+                                    Enable medication reminders
+                                </label>
+                            </div>
+                            
+                            <div id="reminder_section" style="display: none;">
+                                <div class="row">
+                                    <div class="col-md-4 mb-2">
+                                        <input type="time" class="form-control" name="reminder_times" placeholder="Reminder time">
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <input type="time" class="form-control" name="reminder_times" placeholder="Reminder time">
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <input type="time" class="form-control" name="reminder_times" placeholder="Reminder time">
+                                    </div>
+                                </div>
+                                <div class="form-text">Set up to 3 reminder times per day</div>
+                            </div>
+                        </div>
+
+                        <!-- Additional Information -->
+                        <div class="mb-4">
+                            <label for="description" class="form-label">Additional Notes</label>
+                            <textarea class="form-control" id="description" name="description" rows="2" 
+                                      placeholder="Any additional information about this medication"></textarea>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{% url 'medication_management:list' %}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>Add Medication
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Common Diabetes Medications -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2 text-info"></i>
+                        Common Diabetes Medications
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6 class="text-primary mb-1">Insulin</h6>
+                        <small class="text-muted">Fast-acting, long-acting, or intermediate-acting insulin</small>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="text-primary mb-1">Metformin</h6>
+                        <small class="text-muted">First-line treatment for Type 2 diabetes</small>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="text-primary mb-1">Sulfonylureas</h6>
+                        <small class="text-muted">Stimulate insulin production (e.g., Glipizide, Glyburide)</small>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="text-primary mb-1">DPP-4 Inhibitors</h6>
+                        <small class="text-muted">Help regulate blood sugar (e.g., Sitagliptin)</small>
+                    </div>
+                    <div class="text-center">
+                        <a href="{% url 'education:home' %}" class="btn btn-sm btn-outline-info">
+                            Learn More About Medications
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Safety Tips -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-shield-alt me-2"></i>
+                        Safety Tips
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6 class="mb-1">Verify Information</h6>
+                        <small class="text-muted">Double-check medication names, dosages, and instructions</small>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="mb-1">Consult Your Doctor</h6>
+                        <small class="text-muted">Always follow your healthcare provider's instructions</small>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="mb-1">Check Interactions</h6>
+                        <small class="text-muted">Use our interaction checker after adding medications</small>
+                    </div>
+                    <div class="text-center">
+                        <a href="{% url 'medication_management:interactions' %}" class="btn btn-sm btn-outline-warning">
+                            Check Drug Interactions
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleReminders() {
+    const checkbox = document.getElementById('enable_reminders');
+    const section = document.getElementById('reminder_section');
+    section.style.display = checkbox.checked ? 'block' : 'none';
+}
+
+// Set default start date to today
+document.getElementById('start_date').valueAsDate = new Date();
+
+// Auto-suggest medication types based on name
+document.getElementById('medication_name').addEventListener('input', function() {
+    const name = this.value.toLowerCase();
+    const typeSelect = document.getElementById('medication_type');
+    
+    if (name.includes('insulin')) {
+        typeSelect.value = 'insulin';
+    } else if (name.includes('metformin')) {
+        typeSelect.value = 'metformin';
+    } else if (name.includes('glipizide') || name.includes('glyburide') || name.includes('glimepiride')) {
+        typeSelect.value = 'sulfonylurea';
+    } else if (name.includes('sitagliptin') || name.includes('linagliptin')) {
+        typeSelect.value = 'dpp4';
+    } else if (name.includes('empagliflozin') || name.includes('canagliflozin')) {
+        typeSelect.value = 'sglt2';
+    } else if (name.includes('liraglutide') || name.includes('semaglutide')) {
+        typeSelect.value = 'glp1';
+    }
+});
+</script>
+{% endblock %}

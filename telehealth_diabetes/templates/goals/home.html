@@ -1,0 +1,384 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Goals & Achievements - Telehealth Diabetes Care{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Hero Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="bg-gradient-goals text-white rounded-3 p-5 text-center">
+                <h1 class="display-4 fw-bold mb-3">
+                    <i class="fas fa-target me-3"></i>
+                    Goals & Achievements
+                </h1>
+                <p class="lead mb-4">
+                    Set meaningful goals, track your progress, and celebrate your diabetes management achievements
+                </p>
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'goals:dashboard' %}" class="btn btn-light btn-lg">
+                            <i class="fas fa-tachometer-alt me-2"></i>My Dashboard
+                        </a>
+                        <a href="{% url 'goals:create' %}" class="btn btn-outline-light btn-lg">
+                            <i class="fas fa-plus me-2"></i>Set New Goal
+                        </a>
+                        <a href="{% url 'goals:achievements' %}" class="btn btn-outline-light btn-lg">
+                            <i class="fas fa-trophy me-2"></i>My Achievements
+                        </a>
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}" class="btn btn-light btn-lg">
+                            <i class="fas fa-sign-in-alt me-2"></i>Login to Set Goals
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User's Active Goals -->
+    {% if user.is_authenticated and user_goals %}
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-bullseye me-2 text-primary"></i>
+                            My Active Goals
+                        </h5>
+                        <a href="{% url 'goals:dashboard' %}" class="btn btn-sm btn-outline-primary">
+                            View All Goals
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for goal in user_goals %}
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-start border-success border-3">
+                                <div class="card-body">
+                                    <h6 class="card-title mb-1">{{ goal.title }}</h6>
+                                    <p class="text-muted mb-2">{{ goal.description|truncatewords:10 }}</p>
+                                    
+                                    <!-- Progress Bar -->
+                                    {% if goal.target_value %}
+                                        {% widthratio goal.current_value goal.target_value 100 as progress_percent %}
+                                        <div class="progress mb-2" style="height: 8px;">
+                                            <div class="progress-bar bg-success" style="width: {{ progress_percent }}%"></div>
+                                        </div>
+                                        <small class="text-muted">
+                                            {{ goal.current_value }}/{{ goal.target_value }} {{ goal.target_unit }}
+                                        </small>
+                                    {% endif %}
+                                    
+                                    <div class="d-flex justify-content-between align-items-center mt-2">
+                                        <small class="text-muted">
+                                            Due: {{ goal.target_date|date:"M d" }}
+                                        </small>
+                                        <a href="{% url 'goals:detail' goal.id %}" class="btn btn-sm btn-success">
+                                            Update
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Goal Categories -->
+            <div class="row mb-5">
+                <div class="col-12">
+                    <h2 class="h3 text-primary mb-4">
+                        <i class="fas fa-th-large me-2"></i>
+                        Goal Categories
+                    </h2>
+                </div>
+                
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 border-0 shadow-sm category-card">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <i class="fas fa-tint fa-3x text-primary"></i>
+                            </div>
+                            <h5 class="card-title">Blood Sugar Control</h5>
+                            <p class="card-text text-muted">Set targets for HbA1c, daily glucose readings, and time in range.</p>
+                            <a href="{% url 'goals:create' %}?category=blood_sugar" class="btn btn-primary">
+                                Set Blood Sugar Goal
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 border-0 shadow-sm category-card">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <i class="fas fa-weight fa-3x text-success"></i>
+                            </div>
+                            <h5 class="card-title">Weight Management</h5>
+                            <p class="card-text text-muted">Track weight loss, gain, or maintenance goals for better diabetes control.</p>
+                            <a href="{% url 'goals:create' %}?category=weight" class="btn btn-success">
+                                Set Weight Goal
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 border-0 shadow-sm category-card">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <i class="fas fa-running fa-3x text-info"></i>
+                            </div>
+                            <h5 class="card-title">Exercise & Activity</h5>
+                            <p class="card-text text-muted">Set goals for daily steps, workout frequency, or activity duration.</p>
+                            <a href="{% url 'goals:create' %}?category=exercise" class="btn btn-info">
+                                Set Exercise Goal
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 border-0 shadow-sm category-card">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <i class="fas fa-pills fa-3x text-warning"></i>
+                            </div>
+                            <h5 class="card-title">Medication Adherence</h5>
+                            <p class="card-text text-muted">Track medication compliance and establish consistent routines.</p>
+                            <a href="{% url 'goals:create' %}?category=medication" class="btn btn-warning">
+                                Set Medication Goal
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Featured Goal Templates -->
+            {% if featured_templates %}
+            <div class="row mb-5">
+                <div class="col-12">
+                    <h2 class="h3 text-primary mb-4">
+                        <i class="fas fa-star me-2"></i>
+                        Popular Goal Templates
+                    </h2>
+                </div>
+                {% for template in featured_templates %}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 border-0 shadow-sm template-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-primary">{{ template.get_category_display }}</span>
+                                <span class="badge bg-warning">Popular</span>
+                            </div>
+                            <h5 class="card-title">{{ template.title }}</h5>
+                            <p class="card-text text-muted">{{ template.description|truncatewords:20 }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    <i class="fas fa-target me-1"></i>
+                                    Target: {{ template.default_target_value }} {{ template.target_unit }}
+                                </small>
+                                <a href="{% url 'goals:create' %}?template={{ template.id }}" class="btn btn-outline-primary">
+                                    Use Template
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Goal Setting Tips -->
+            <div class="row mb-5">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white border-0">
+                            <h5 class="mb-0">
+                                <i class="fas fa-lightbulb me-2 text-info"></i>
+                                SMART Goal Setting Tips
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <h6 class="text-primary mb-1">
+                                            <i class="fas fa-check me-1"></i>Specific
+                                        </h6>
+                                        <small class="text-muted">Define exactly what you want to achieve</small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6 class="text-primary mb-1">
+                                            <i class="fas fa-check me-1"></i>Measurable
+                                        </h6>
+                                        <small class="text-muted">Include numbers and metrics you can track</small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6 class="text-primary mb-1">
+                                            <i class="fas fa-check me-1"></i>Achievable
+                                        </h6>
+                                        <small class="text-muted">Set realistic goals based on your current situation</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <h6 class="text-primary mb-1">
+                                            <i class="fas fa-check me-1"></i>Relevant
+                                        </h6>
+                                        <small class="text-muted">Choose goals that matter for your diabetes management</small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <h6 class="text-primary mb-1">
+                                            <i class="fas fa-check me-1"></i>Time-bound
+                                        </h6>
+                                        <small class="text-muted">Set a clear deadline for achieving your goal</small>
+                                    </div>
+                                    <div class="text-center mt-3">
+                                        <a href="{% url 'goals:templates' %}" class="btn btn-outline-info">
+                                            Browse All Templates
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Quick Actions -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bolt me-2 text-primary"></i>
+                        Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        {% if user.is_authenticated %}
+                        <a href="{% url 'goals:create' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Create New Goal
+                        </a>
+                        <a href="{% url 'goals:dashboard' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-tachometer-alt me-2"></i>Goals Dashboard
+                        </a>
+                        <a href="{% url 'goals:list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-list me-2"></i>View All Goals
+                        </a>
+                        <a href="{% url 'goals:achievements' %}" class="btn btn-outline-warning">
+                            <i class="fas fa-trophy me-2"></i>My Achievements
+                        </a>
+                        {% else %}
+                        <a href="{% url 'accounts:login' %}" class="btn btn-primary">
+                            <i class="fas fa-sign-in-alt me-2"></i>Login to Start
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'goals:templates' %}" class="btn btn-outline-info">
+                            <i class="fas fa-template me-2"></i>Goal Templates
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Achievement Showcase -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-trophy me-2 text-warning"></i>
+                        Achievement Types
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-medal text-warning me-2"></i>
+                            <div>
+                                <h6 class="mb-0">Goal Completion</h6>
+                                <small class="text-muted">Complete any goal on time</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-fire text-danger me-2"></i>
+                            <div>
+                                <h6 class="mb-0">Consistency Streak</h6>
+                                <small class="text-muted">Track progress for consecutive days</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-star text-primary me-2"></i>
+                            <div>
+                                <h6 class="mb-0">Milestone Reached</h6>
+                                <small class="text-muted">Achieve significant health milestones</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-crown text-success me-2"></i>
+                            <div>
+                                <h6 class="mb-0">Excellence Award</h6>
+                                <small class="text-muted">Exceed your target goals</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Motivation -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">
+                        <i class="fas fa-heart me-2 text-danger"></i>
+                        Daily Motivation
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <blockquote class="blockquote text-center">
+                        <p class="mb-3">"Success is the sum of small efforts repeated day in and day out."</p>
+                        <footer class="blockquote-footer">Robert Collier</footer>
+                    </blockquote>
+                    <div class="text-center mt-3">
+                        <small class="text-muted">
+                            Every small step towards your goals matters. Keep going!
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.bg-gradient-goals {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.category-card, .template-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.category-card:hover, .template-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+</style>
+{% endblock %}

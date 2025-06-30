@@ -1,0 +1,443 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Exercise Programs - Telehealth Diabetes Care{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Hero Section -->
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h1 class="display-4 text-primary mb-4">
+                <i class="fas fa-running me-3"></i>
+                Exercise Programs for Diabetes
+            </h1>
+            <p class="lead">Safe, effective exercises designed specifically for diabetes management</p>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <select class="form-select" id="intensityFilter">
+                <option value="">All Intensity Levels</option>
+                <option value="low" {% if selected_intensity == 'low' %}selected{% endif %}>Low Intensity</option>
+                <option value="moderate" {% if selected_intensity == 'moderate' %}selected{% endif %}>Moderate Intensity</option>
+                <option value="high" {% if selected_intensity == 'high' %}selected{% endif %}>High Intensity</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <select class="form-select" id="typeFilter">
+                <option value="">All Exercise Types</option>
+                <option value="cardio">Cardiovascular</option>
+                <option value="strength">Strength Training</option>
+                <option value="flexibility">Flexibility</option>
+                <option value="balance">Balance</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <select class="form-select" id="durationFilter">
+                <option value="">All Durations</option>
+                <option value="short">Under 15 minutes</option>
+                <option value="medium">15-30 minutes</option>
+                <option value="long">Over 30 minutes</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Safety Guidelines -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="alert alert-warning">
+                <h5 class="alert-heading">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Important Safety Guidelines
+                </h5>
+                <ul class="mb-0">
+                    <li>Check your blood glucose before and after exercise</li>
+                    <li>Stay hydrated and carry glucose tablets</li>
+                    <li>Start slowly and gradually increase intensity</li>
+                    <li>Stop exercising if you feel dizzy, short of breath, or unwell</li>
+                    <li>Consult your healthcare provider before starting any new exercise program</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Exercise Programs -->
+    <div class="row">
+        {% if exercises %}
+            {% for exercise in exercises %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="card-title mb-0">{{ exercise.title }}</h5>
+                        <small>{{ exercise.get_intensity_display }} • {{ exercise.duration }} minutes</small>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">{{ exercise.description|truncatewords:20 }}</p>
+                        
+                        <div class="mb-3">
+                            <span class="badge bg-info me-1">{{ exercise.get_exercise_type_display }}</span>
+                            <span class="badge bg-success">{{ exercise.get_intensity_display }}</span>
+                        </div>
+
+                        <div class="row text-center mb-3">
+                            <div class="col-4">
+                                <i class="fas fa-clock text-primary"></i>
+                                <div class="small">{{ exercise.duration }} min</div>
+                            </div>
+                            <div class="col-4">
+                                <i class="fas fa-fire text-danger"></i>
+                                <div class="small">{{ exercise.calories_burned }} cal</div>
+                            </div>
+                            <div class="col-4">
+                                <i class="fas fa-chart-line text-success"></i>
+                                <div class="small">{{ exercise.get_intensity_display }}</div>
+                            </div>
+                        </div>
+
+                        {% if exercise.equipment_needed %}
+                        <div class="mb-2">
+                            <strong>Equipment:</strong> {{ exercise.equipment_needed }}
+                        </div>
+                        {% endif %}
+
+                        {% if exercise.precautions %}
+                        <div class="mb-2">
+                            <small class="text-warning">
+                                <i class="fas fa-exclamation-circle me-1"></i>
+                                {{ exercise.precautions|truncatewords:10 }}
+                            </small>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer bg-transparent border-0">
+                        <a href="#" class="btn btn-primary btn-sm">View Details</a>
+                        <button class="btn btn-outline-secondary btn-sm float-end">
+                            <i class="fas fa-bookmark"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <!-- Sample Exercise Programs -->
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="card-title mb-0">Morning Walk Routine</h5>
+                        <small>Low Intensity • 30 minutes</small>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">A gentle walking routine perfect for starting your day and managing blood glucose levels.</p>
+                        
+                        <div class="mb-3">
+                            <span class="badge bg-info me-1">Cardiovascular</span>
+                            <span class="badge bg-success">Low Intensity</span>
+                        </div>
+
+                        <div class="row text-center mb-3">
+                            <div class="col-4">
+                                <i class="fas fa-clock text-primary"></i>
+                                <div class="small">30 min</div>
+                            </div>
+                            <div class="col-4">
+                                <i class="fas fa-fire text-danger"></i>
+                                <div class="small">120 cal</div>
+                            </div>
+                            <div class="col-4">
+                                <i class="fas fa-chart-line text-success"></i>
+                                <div class="small">Low</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-2">
+                            <strong>Equipment:</strong> Comfortable walking shoes
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-0">
+                        <a href="#" class="btn btn-success btn-sm">View Details</a>
+                        <button class="btn btn-outline-secondary btn-sm float-end">
+                            <i class="fas fa-bookmark"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-header bg-warning text-white">
+                        <h5 class="card-title mb-0">Chair Exercises</h5>
+                        <small>Low Intensity • 15 minutes</small>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Gentle exercises you can do from a chair, perfect for those with mobility limitations.</p>
+                        
+                        <div class="mb-3">
+                            <span class="badge bg-info me-1">Strength</span>
+                            <span class="badge bg-success">Low Intensity</span>
+                        </div>
+
+                        <div class="row text-center mb-3">
+                            <div class="col-4">
+                                <i class="fas fa-clock text-primary"></i>
+                                <div class="small">15 min</div>
+                            </div>
+                            <div class="col-4">
+                                <i class="fas fa-fire text-danger"></i>
+                                <div class="small">60 cal</div>
+                            </div>
+                            <div class="col-4">
+                                <i class="fas fa-chart-line text-success"></i>
+                                <div class="small">Low</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-2">
+                            <strong>Equipment:</strong> Sturdy chair
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-0">
+                        <a href="#" class="btn btn-warning btn-sm">View Details</a>
+                        <button class="btn btn-outline-secondary btn-sm float-end">
+                            <i class="fas fa-bookmark"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="card-title mb-0">Water Aerobics</h5>
+                        <small>Moderate Intensity • 45 minutes</small>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Low-impact water exercises that are easy on joints while providing excellent cardiovascular benefits.</p>
+                        
+                        <div class="mb-3">
+                            <span class="badge bg-primary me-1">Cardiovascular</span>
+                            <span class="badge bg-warning">Moderate</span>
+                        </div>
+
+                        <div class="row text-center mb-3">
+                            <div class="col-4">
+                                <i class="fas fa-clock text-primary"></i>
+                                <div class="small">45 min</div>
+                            </div>
+                            <div class="col-4">
+                                <i class="fas fa-fire text-danger"></i>
+                                <div class="small">300 cal</div>
+                            </div>
+                            <div class="col-4">
+                                <i class="fas fa-chart-line text-success"></i>
+                                <div class="small">Moderate</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-2">
+                            <strong>Equipment:</strong> Pool access, swimwear
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-0">
+                        <a href="#" class="btn btn-info btn-sm">View Details</a>
+                        <button class="btn btn-outline-secondary btn-sm float-end">
+                            <i class="fas fa-bookmark"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="card-title mb-0">Resistance Band Workout</h5>
+                        <small>Moderate Intensity • 25 minutes</small>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Strength training using resistance bands to build muscle and improve insulin sensitivity.</p>
+                        
+                        <div class="mb-3">
+                            <span class="badge bg-success me-1">Strength</span>
+                            <span class="badge bg-warning">Moderate</span>
+                        </div>
+
+                        <div class="row text-center mb-3">
+                            <div class="col-4">
+                                <i class="fas fa-clock text-primary"></i>
+                                <div class="small">25 min</div>
+                            </div>
+                            <div class="col-4">
+                                <i class="fas fa-fire text-danger"></i>
+                                <div class="small">150 cal</div>
+                            </div>
+                            <div class="col-4">
+                                <i class="fas fa-chart-line text-success"></i>
+                                <div class="small">Moderate</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-2">
+                            <strong>Equipment:</strong> Resistance bands set
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-0">
+                        <a href="#" class="btn btn-danger btn-sm">View Details</a>
+                        <button class="btn btn-outline-secondary btn-sm float-end">
+                            <i class="fas fa-bookmark"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-header bg-purple text-white">
+                        <h5 class="card-title mb-0">Yoga for Diabetes</h5>
+                        <small>Low Intensity • 40 minutes</small>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Gentle yoga poses that help reduce stress, improve flexibility, and support blood sugar management.</p>
+                        
+                        <div class="mb-3">
+                            <span class="badge bg-info me-1">Flexibility</span>
+                            <span class="badge bg-success">Low Intensity</span>
+                        </div>
+
+                        <div class="row text-center mb-3">
+                            <div class="col-4">
+                                <i class="fas fa-clock text-primary"></i>
+                                <div class="small">40 min</div>
+                            </div>
+                            <div class="col-4">
+                                <i class="fas fa-fire text-danger"></i>
+                                <div class="small">120 cal</div>
+                            </div>
+                            <div class="col-4">
+                                <i class="fas fa-chart-line text-success"></i>
+                                <div class="small">Low</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-2">
+                            <strong>Equipment:</strong> Yoga mat
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-0">
+                        <a href="#" class="btn btn-purple btn-sm">View Details</a>
+                        <button class="btn btn-outline-secondary btn-sm float-end">
+                            <i class="fas fa-bookmark"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="card-title mb-0">Balance Training</h5>
+                        <small>Low Intensity • 20 minutes</small>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Balance exercises to prevent falls and improve stability, especially important for diabetic neuropathy.</p>
+                        
+                        <div class="mb-3">
+                            <span class="badge bg-warning me-1">Balance</span>
+                            <span class="badge bg-success">Low Intensity</span>
+                        </div>
+
+                        <div class="row text-center mb-3">
+                            <div class="col-4">
+                                <i class="fas fa-clock text-primary"></i>
+                                <div class="small">20 min</div>
+                            </div>
+                            <div class="col-4">
+                                <i class="fas fa-fire text-danger"></i>
+                                <div class="small">80 cal</div>
+                            </div>
+                            <div class="col-4">
+                                <i class="fas fa-chart-line text-success"></i>
+                                <div class="small">Low</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-2">
+                            <strong>Equipment:</strong> None required
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-0">
+                        <a href="#" class="btn btn-dark btn-sm">View Details</a>
+                        <button class="btn btn-outline-secondary btn-sm float-end">
+                            <i class="fas fa-bookmark"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Exercise Benefits -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-lg bg-primary text-white">
+                <div class="card-body p-5">
+                    <h2 class="text-center mb-4">Benefits of Exercise for Diabetes</h2>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <h5><i class="fas fa-chart-line me-2"></i>Better Blood Sugar Control</h5>
+                            <p>Regular exercise helps your muscles use glucose more effectively, leading to better blood sugar management.</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h5><i class="fas fa-heart me-2"></i>Improved Heart Health</h5>
+                            <p>Exercise strengthens your heart and improves circulation, reducing cardiovascular disease risk.</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h5><i class="fas fa-weight me-2"></i>Weight Management</h5>
+                            <p>Physical activity helps maintain a healthy weight, which is crucial for diabetes management.</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h5><i class="fas fa-smile me-2"></i>Enhanced Mood</h5>
+                            <p>Exercise releases endorphins that improve mood and reduce stress, anxiety, and depression.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.bg-purple {
+    background-color: #6f42c1 !important;
+}
+.btn-purple {
+    background-color: #6f42c1;
+    border-color: #6f42c1;
+    color: white;
+}
+.btn-purple:hover {
+    background-color: #5a359a;
+    border-color: #5a359a;
+    color: white;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Filter functionality
+    const filters = ['intensityFilter', 'typeFilter', 'durationFilter'];
+    
+    filters.forEach(filterId => {
+        document.getElementById(filterId).addEventListener('change', function() {
+            // In a real application, this would filter the exercises
+            // For now, we'll just reload the page with the filter parameter
+            const intensity = document.getElementById('intensityFilter').value;
+            if (intensity) {
+                window.location.href = `?intensity=${intensity}`;
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

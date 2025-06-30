@@ -1,0 +1,322 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Coping Strategies - Telehealth Diabetes Care{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-lightbulb text-primary me-2"></i>
+                        Coping Strategies
+                    </h1>
+                    <p class="text-muted mb-0">Practical techniques for managing stress and emotions</p>
+                </div>
+                <a href="{% url 'mental_health:dashboard' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-chart-line me-2"></i>View Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Options -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title">Filter by Type:</h6>
+                    <div class="btn-group flex-wrap" role="group">
+                        <a href="{% url 'mental_health:coping_strategies' %}" 
+                           class="btn {% if not selected_type %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                            All Strategies
+                        </a>
+                        <a href="{% url 'mental_health:coping_strategies' %}?type=breathing" 
+                           class="btn {% if selected_type == 'breathing' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                            Breathing
+                        </a>
+                        <a href="{% url 'mental_health:coping_strategies' %}?type=mindfulness" 
+                           class="btn {% if selected_type == 'mindfulness' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                            Mindfulness
+                        </a>
+                        <a href="{% url 'mental_health:coping_strategies' %}?type=physical" 
+                           class="btn {% if selected_type == 'physical' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                            Physical Activity
+                        </a>
+                        <a href="{% url 'mental_health:coping_strategies' %}?type=cognitive" 
+                           class="btn {% if selected_type == 'cognitive' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                            Cognitive
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Strategies Grid -->
+    <div class="row">
+        {% if strategies %}
+            {% for strategy in strategies %}
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <h5 class="card-title">{{ strategy.title }}</h5>
+                                <span class="badge bg-info">{{ strategy.get_strategy_type_display }}</span>
+                            </div>
+                            <p class="card-text">{{ strategy.description }}</p>
+                            {% if strategy.instructions %}
+                                <div class="mb-3">
+                                    <h6>Instructions:</h6>
+                                    <div class="bg-light p-3 rounded">
+                                        {{ strategy.instructions|linebreaks }}
+                                    </div>
+                                </div>
+                            {% endif %}
+                            {% if strategy.duration %}
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>
+                                    Duration: {{ strategy.duration }} minutes
+                                </small>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="text-center py-5">
+                    <i class="fas fa-lightbulb fa-4x text-muted mb-4"></i>
+                    <h4 class="text-muted">No Strategies Found</h4>
+                    <p class="text-muted">
+                        {% if selected_type %}
+                            No strategies found for "{{ selected_type }}". Try a different type.
+                        {% else %}
+                            Coping strategies will be available soon.
+                        {% endif %}
+                    </p>
+                    <a href="{% url 'mental_health:coping_strategies' %}" class="btn btn-primary">
+                        <i class="fas fa-refresh me-2"></i>View All Strategies
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Quick Techniques -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <h4 class="mb-4">
+                <i class="fas fa-bolt text-warning me-2"></i>
+                Quick Techniques (Try Now)
+            </h4>
+        </div>
+        
+        <!-- 4-7-8 Breathing -->
+        <div class="col-lg-6 mb-4">
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">4-7-8 Breathing Exercise</h5>
+                </div>
+                <div class="card-body">
+                    <p>A simple breathing technique to reduce anxiety and promote relaxation.</p>
+                    <ol>
+                        <li>Inhale through your nose for 4 counts</li>
+                        <li>Hold your breath for 7 counts</li>
+                        <li>Exhale through your mouth for 8 counts</li>
+                        <li>Repeat 3-4 times</li>
+                    </ol>
+                    <button class="btn btn-primary" onclick="startBreathingExercise()">
+                        <i class="fas fa-play me-2"></i>Start Exercise
+                    </button>
+                    <div id="breathingGuide" class="mt-3" style="display: none;">
+                        <div class="text-center">
+                            <div id="breathingCircle" class="mx-auto mb-3" 
+                                 style="width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(45deg, #007bff, #0056b3); transition: transform 0.5s ease;"></div>
+                            <h5 id="breathingInstruction">Get Ready...</h5>
+                            <p id="breathingCount"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5-4-3-2-1 Grounding -->
+        <div class="col-lg-6 mb-4">
+            <div class="card border-success">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">5-4-3-2-1 Grounding Technique</h5>
+                </div>
+                <div class="card-body">
+                    <p>A mindfulness technique to help you stay present and reduce anxiety.</p>
+                    <ul>
+                        <li><strong>5 things</strong> you can see</li>
+                        <li><strong>4 things</strong> you can touch</li>
+                        <li><strong>3 things</strong> you can hear</li>
+                        <li><strong>2 things</strong> you can smell</li>
+                        <li><strong>1 thing</strong> you can taste</li>
+                    </ul>
+                    <button class="btn btn-success" onclick="startGroundingExercise()">
+                        <i class="fas fa-play me-2"></i>Start Exercise
+                    </button>
+                    <div id="groundingGuide" class="mt-3" style="display: none;">
+                        <div class="alert alert-success">
+                            <h6 id="groundingStep"></h6>
+                            <p id="groundingInstruction"></p>
+                            <button class="btn btn-sm btn-outline-success" onclick="nextGroundingStep()">Next</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Emergency Techniques -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Emergency Coping Techniques
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p>Use these techniques when feeling overwhelmed or in crisis:</p>
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <div class="text-center p-3 bg-light rounded">
+                                <i class="fas fa-snowflake fa-2x text-info mb-2"></i>
+                                <h6>Ice Cube Technique</h6>
+                                <p class="small">Hold an ice cube to ground yourself</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="text-center p-3 bg-light rounded">
+                                <i class="fas fa-running fa-2x text-success mb-2"></i>
+                                <h6>Physical Movement</h6>
+                                <p class="small">Jump, run in place, or do jumping jacks</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="text-center p-3 bg-light rounded">
+                                <i class="fas fa-phone fa-2x text-primary mb-2"></i>
+                                <h6>Call Someone</h6>
+                                <p class="small">Reach out to a trusted friend or family member</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="text-center p-3 bg-light rounded">
+                                <i class="fas fa-exclamation-triangle fa-2x text-danger mb-2"></i>
+                                <h6>Crisis Hotline</h6>
+                                <p class="small">Call 0800 720 000 for immediate support</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="{% url 'mental_health:crisis_resources' %}" class="btn btn-danger">
+                            <i class="fas fa-phone me-2"></i>Crisis Resources
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Breathing Exercise
+let breathingTimer;
+let breathingStep = 0;
+const breathingSteps = [
+    { instruction: "Inhale through nose", count: 4, action: "inhale" },
+    { instruction: "Hold your breath", count: 7, action: "hold" },
+    { instruction: "Exhale through mouth", count: 8, action: "exhale" },
+    { instruction: "Rest", count: 2, action: "rest" }
+];
+
+function startBreathingExercise() {
+    document.getElementById('breathingGuide').style.display = 'block';
+    breathingStep = 0;
+    runBreathingStep();
+}
+
+function runBreathingStep() {
+    const step = breathingSteps[breathingStep];
+    const circle = document.getElementById('breathingCircle');
+    const instruction = document.getElementById('breathingInstruction');
+    const count = document.getElementById('breathingCount');
+    
+    instruction.textContent = step.instruction;
+    
+    if (step.action === 'inhale') {
+        circle.style.transform = 'scale(1.5)';
+    } else if (step.action === 'exhale') {
+        circle.style.transform = 'scale(0.8)';
+    } else {
+        circle.style.transform = 'scale(1)';
+    }
+    
+    let currentCount = step.count;
+    count.textContent = currentCount;
+    
+    const countDown = setInterval(() => {
+        currentCount--;
+        count.textContent = currentCount;
+        
+        if (currentCount <= 0) {
+            clearInterval(countDown);
+            breathingStep = (breathingStep + 1) % breathingSteps.length;
+            
+            if (breathingStep === 0) {
+                setTimeout(() => {
+                    instruction.textContent = "Exercise Complete! Feel free to repeat.";
+                    count.textContent = "";
+                    circle.style.transform = 'scale(1)';
+                }, 500);
+            } else {
+                setTimeout(runBreathingStep, 500);
+            }
+        }
+    }, 1000);
+}
+
+// Grounding Exercise
+let groundingStep = 0;
+const groundingSteps = [
+    { step: "Step 1: Look around you", instruction: "Name 5 things you can see right now" },
+    { step: "Step 2: Feel your surroundings", instruction: "Name 4 things you can touch" },
+    { step: "Step 3: Listen carefully", instruction: "Name 3 things you can hear" },
+    { step: "Step 4: Take a deep breath", instruction: "Name 2 things you can smell" },
+    { step: "Step 5: Focus inward", instruction: "Name 1 thing you can taste" },
+    { step: "Complete!", instruction: "Great job! You've successfully grounded yourself." }
+];
+
+function startGroundingExercise() {
+    document.getElementById('groundingGuide').style.display = 'block';
+    groundingStep = 0;
+    showGroundingStep();
+}
+
+function showGroundingStep() {
+    const step = groundingSteps[groundingStep];
+    document.getElementById('groundingStep').textContent = step.step;
+    document.getElementById('groundingInstruction').textContent = step.instruction;
+}
+
+function nextGroundingStep() {
+    groundingStep++;
+    if (groundingStep < groundingSteps.length) {
+        showGroundingStep();
+    } else {
+        document.getElementById('groundingGuide').style.display = 'none';
+        groundingStep = 0;
+    }
+}
+</script>
+{% endblock %}

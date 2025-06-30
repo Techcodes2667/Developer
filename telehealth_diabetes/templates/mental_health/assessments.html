@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mental Health Assessments - Telehealth Diabetes Care{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-clipboard-check text-primary me-2"></i>
+                        Mental Health Assessments
+                    </h1>
+                    <p class="text-muted mb-0">Self-assessment tools to understand your mental health</p>
+                </div>
+                <a href="{% url 'mental_health:dashboard' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-chart-line me-2"></i>View Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assessments Grid -->
+    <div class="row">
+        {% if assessments %}
+            {% for assessment in assessments %}
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ assessment.title }}</h5>
+                            <p class="card-text">{{ assessment.description|truncatewords:20 }}</p>
+                            <div class="mb-3">
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>
+                                    Estimated time: {{ assessment.estimated_time }} minutes
+                                </small>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <a href="{% url 'mental_health:take_assessment' assessment.id %}" 
+                               class="btn btn-primary w-100">
+                                <i class="fas fa-play me-2"></i>Take Assessment
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="text-center py-5">
+                    <i class="fas fa-clipboard-check fa-4x text-muted mb-4"></i>
+                    <h4 class="text-muted">No Assessments Available</h4>
+                    <p class="text-muted">Mental health assessments will be available soon.</p>
+                    <a href="{% url 'mental_health:home' %}" class="btn btn-primary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Mental Health
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Information Section -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-info-circle text-info me-2"></i>
+                        About Mental Health Assessments
+                    </h5>
+                    <p class="card-text">
+                        These self-assessment tools are designed to help you understand your mental health better. 
+                        They are not diagnostic tools and should not replace professional medical advice.
+                    </p>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Benefits of Regular Assessment:</h6>
+                            <ul>
+                                <li>Track your mental health over time</li>
+                                <li>Identify patterns and triggers</li>
+                                <li>Better communicate with healthcare providers</li>
+                                <li>Monitor progress in treatment</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Important Notes:</h6>
+                            <ul>
+                                <li>Results are confidential and secure</li>
+                                <li>Take assessments in a quiet, private space</li>
+                                <li>Answer honestly for accurate results</li>
+                                <li>Consult professionals for concerning results</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

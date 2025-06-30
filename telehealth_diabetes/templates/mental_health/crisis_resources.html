@@ -1,0 +1,315 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Crisis Resources - Telehealth Diabetes Care{% endblock %}
+
+{% block extra_css %}
+<style>
+.crisis-card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+}
+
+.crisis-card:hover {
+    transform: translateY(-2px);
+}
+
+.emergency-banner {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    color: white;
+    border-radius: 15px;
+    padding: 2rem;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.hotline-card {
+    border-left: 5px solid #dc3545;
+    background: #fff;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    border-radius: 0 10px 10px 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.warning-sign {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.phone-button {
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1.1rem;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.phone-button:hover {
+    background: #218838;
+    color: white;
+    transform: scale(1.05);
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Emergency Banner -->
+    <div class="emergency-banner pulse">
+        <h1 class="display-4 fw-bold mb-3">
+            <i class="fas fa-exclamation-triangle me-3"></i>
+            Crisis Support
+        </h1>
+        <p class="lead mb-4">
+            If you're having thoughts of self-harm or suicide, please reach out for help immediately.
+        </p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a href="tel:0800720000" class="phone-button">
+                <i class="fas fa-phone me-2"></i>
+                Call 0800 720 000
+            </a>
+            <a href="tel:999" class="phone-button" style="background: #dc3545;">
+                <i class="fas fa-ambulance me-2"></i>
+                Emergency: 999
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Crisis Hotlines -->
+        <div class="col-lg-8 mb-4">
+            <div class="card crisis-card">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-phone me-2"></i>
+                        Crisis Hotlines & Support
+                    </h4>
+                </div>
+                <div class="card-body">
+                    {% for resource in crisis_resources %}
+                        <div class="hotline-card">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <h5 class="mb-1 text-danger">{{ resource.name }}</h5>
+                                    <p class="mb-1">{{ resource.description }}</p>
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock me-1"></i>
+                                        {{ resource.availability }}
+                                    </small>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <a href="tel:{{ resource.phone }}" class="phone-button">
+                                        <i class="fas fa-phone me-2"></i>
+                                        {{ resource.phone }}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+
+                    <!-- Additional Resources -->
+                    <div class="mt-4">
+                        <h5 class="text-danger mb-3">
+                            <i class="fas fa-globe me-2"></i>
+                            Online Resources
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="card border-primary">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Crisis Text Line</h6>
+                                        <p class="card-text small">Text "HELLO" to 741741</p>
+                                        <a href="sms:741741?body=HELLO" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-sms me-1"></i>Send Text
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="card border-info">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Online Chat Support</h6>
+                                        <p class="card-text small">24/7 crisis chat support</p>
+                                        <a href="https://www.befrienders.org" target="_blank" class="btn btn-outline-info btn-sm">
+                                            <i class="fas fa-comments me-1"></i>Start Chat
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Warning Signs -->
+        <div class="col-lg-4 mb-4">
+            <div class="card crisis-card">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Warning Signs
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-3">Seek immediate help if you or someone you know experiences:</p>
+                    {% for sign in warning_signs %}
+                        <div class="warning-sign">
+                            <i class="fas fa-exclamation-circle text-warning me-2"></i>
+                            {{ sign }}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Safety Plan -->
+            <div class="card crisis-card mt-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-shield-alt me-2"></i>
+                        Safety Plan
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <ol class="list-unstyled">
+                        <li class="mb-2">
+                            <strong>1. Recognize warning signs</strong>
+                            <br><small class="text-muted">Know your personal triggers</small>
+                        </li>
+                        <li class="mb-2">
+                            <strong>2. Use coping strategies</strong>
+                            <br><small class="text-muted">Deep breathing, meditation, exercise</small>
+                        </li>
+                        <li class="mb-2">
+                            <strong>3. Contact support people</strong>
+                            <br><small class="text-muted">Family, friends, or trusted individuals</small>
+                        </li>
+                        <li class="mb-2">
+                            <strong>4. Contact professionals</strong>
+                            <br><small class="text-muted">Therapist, doctor, or crisis hotline</small>
+                        </li>
+                        <li class="mb-2">
+                            <strong>5. Make environment safe</strong>
+                            <br><small class="text-muted">Remove harmful objects</small>
+                        </li>
+                        <li class="mb-0">
+                            <strong>6. Go to emergency room</strong>
+                            <br><small class="text-muted">If immediate danger exists</small>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Self-Care Tips -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card crisis-card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-heart me-2"></i>
+                        Immediate Self-Care Strategies
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <div class="text-center p-3 bg-light rounded">
+                                <i class="fas fa-lungs fa-2x text-primary mb-2"></i>
+                                <h6>Deep Breathing</h6>
+                                <p class="small mb-0">4-7-8 breathing technique</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="text-center p-3 bg-light rounded">
+                                <i class="fas fa-walking fa-2x text-success mb-2"></i>
+                                <h6>Physical Activity</h6>
+                                <p class="small mb-0">Walk, stretch, or exercise</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="text-center p-3 bg-light rounded">
+                                <i class="fas fa-users fa-2x text-info mb-2"></i>
+                                <h6>Reach Out</h6>
+                                <p class="small mb-0">Call a friend or family member</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="text-center p-3 bg-light rounded">
+                                <i class="fas fa-music fa-2x text-warning mb-2"></i>
+                                <h6>Distraction</h6>
+                                <p class="small mb-0">Music, art, or hobbies</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Important Notice -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="alert alert-info">
+                <h5 class="alert-heading">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Important Notice
+                </h5>
+                <p class="mb-0">
+                    This page provides crisis resources and is not a substitute for professional medical care. 
+                    If you're experiencing a medical emergency, call 999 immediately. 
+                    For ongoing mental health support, please consult with a qualified healthcare provider.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            <a href="{% url 'mental_health:home' %}" class="btn btn-outline-primary me-2">
+                <i class="fas fa-arrow-left me-2"></i>Back to Mental Health
+            </a>
+            <a href="{% url 'mental_health:dashboard' %}" class="btn btn-primary">
+                <i class="fas fa-chart-line me-2"></i>Wellness Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add click tracking for crisis resources
+    const phoneButtons = document.querySelectorAll('.phone-button');
+    phoneButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // You could add analytics tracking here
+            console.log('Crisis resource accessed:', this.href);
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,276 @@
+# Django and Core Dependencies
+Django==4.2.7
+djangorestframework==3.14.0
+django-cors-headers==4.3.1
+django-environ==0.11.2
+python-decouple==3.8
+
+# Database
+psycopg2-binary==2.9.7
+django-extensions==3.2.3
+
+# Authentication and Security
+django-allauth==0.57.0
+django-otp==1.2.2
+django-ratelimit==4.1.0
+django-cryptography==1.1
+django-guardian==2.4.0
+
+# API and Serialization
+djangorestframework-simplejwt==5.3.0
+django-filter==23.3
+drf-spectacular==0.26.5
+
+# File Handling and Storage
+Pillow==10.0.1
+django-storages==1.14.2
+boto3==1.29.7
+
+# Caching and Sessions
+redis==5.0.1
+django-redis==5.4.0
+hiredis==2.2.3
+
+# Email and Notifications
+celery==5.3.4
+django-celery-beat==2.5.0
+django-celery-results==2.5.1
+
+# Forms and Validation
+django-crispy-forms==2.1
+crispy-bootstrap5==0.7
+bleach==6.1.0
+
+# Utilities
+python-dateutil==2.8.2
+pytz==2023.3
+requests==2.31.0
+urllib3==2.0.7
+
+# Development and Testing
+django-debug-toolbar==4.2.0
+factory-boy==3.3.0
+faker==19.12.0
+
+# Monitoring and Logging
+sentry-sdk==1.38.0
+django-health-check==3.17.0
+
+# Charts and Visualization
+matplotlib==3.8.1
+seaborn==0.13.0
+
+# PDF Generation
+reportlab==4.0.7
+weasyprint==60.1
+
+# Excel/CSV Export
+openpyxl==3.1.2
+pandas==2.1.3
+
+# Encryption and Security
+cryptography==41.0.7
+bcrypt==4.1.1
+
+# Web Server (Production)
+gunicorn==21.2.0
+whitenoise==6.6.0
+
+# Environment and Configuration
+python-dotenv==1.0.0
+dj-database-url==2.1.0
+
+# Time and Date Handling
+arrow==1.3.0
+
+# Image Processing
+Pillow==10.0.1
+
+# HTTP Client
+httpx==0.25.2
+
+# JSON Web Tokens
+PyJWT==2.8.0
+
+# Phone Number Validation
+django-phonenumber-field==7.2.0
+phonenumbers==8.13.25
+
+# Rich Text Editor
+django-ckeditor==6.7.0
+
+# Pagination
+django-pure-pagination==0.3.0
+
+# Search
+django-haystack==3.2.1
+whoosh==2.7.4
+
+# Geolocation
+geopy==2.4.0
+
+# QR Code Generation
+qrcode==7.4.2
+
+# Markdown Support
+markdown==3.5.1
+django-markdownx==4.0.2
+
+# Social Authentication
+social-auth-app-django==5.4.0
+
+# API Documentation
+drf-yasg==1.21.7
+
+# Background Tasks
+django-background-tasks==1.2.8
+
+# Timezone Support
+django-timezone-field==6.0.1
+
+# Model Utilities
+django-model-utils==4.3.1
+
+# URL Manipulation
+furl==2.1.3
+
+# Data Validation
+cerberus==1.3.5
+
+# HTTP Status Codes
+http-status==0.2.1
+
+# UUID Utilities
+shortuuid==1.0.11
+
+# Color Utilities
+webcolors==1.13
+
+# Text Processing
+textdistance==4.6.0
+
+# Configuration Management
+dynaconf==3.2.4
+
+# Async Support
+channels==4.0.0
+channels-redis==4.1.0
+
+# WebSocket Support
+websockets==12.0
+
+# Task Queue
+kombu==5.3.4
+
+# Message Broker
+amqp==5.2.0
+
+# Serialization
+msgpack==1.0.7
+
+# Compression
+brotli==1.1.0
+
+# Internationalization
+django-modeltranslation==0.18.11
+
+# Admin Interface Enhancements
+django-admin-interface==0.26.1
+django-colorfield==0.10.1
+
+# API Throttling
+django-rest-framework-throttling==0.1.1
+
+# Content Management
+django-mptt==0.15.0
+
+# Tagging
+django-taggit==4.0.0
+
+# Versioning
+django-reversion==5.0.8
+
+# Import/Export
+django-import-export==3.3.1
+
+# Sitemap
+django-sitemap==2.3
+
+# SEO
+django-meta==2.2.0
+
+# Analytics
+django-analytical==3.1.0
+
+# Backup
+django-dbbackup==4.0.2
+
+# Maintenance Mode
+django-maintenance-mode==0.21.1
+
+# Rate Limiting
+django-axes==6.1.1
+
+# CAPTCHA
+django-recaptcha==3.0.0
+
+# Two-Factor Authentication
+qrcode[pil]==7.4.2
+
+# Password Strength
+django-password-validators==1.7.1
+
+# Session Security
+django-session-security==2.6.7
+
+# CORS
+django-cors-headers==4.3.1
+
+# Content Security Policy
+django-csp==3.7
+
+# SSL Redirect
+django-sslserver==0.22
+
+# Health Checks
+django-health-check==3.17.0
+
+# Performance Monitoring
+django-silk==5.0.4
+
+# Error Tracking
+rollbar==0.16.3
+
+# Logging
+structlog==23.2.0
+
+# Configuration
+django-configurations==2.5
+
+# Feature Flags
+django-waffle==4.1.0
+
+# A/B Testing
+django-experiments==1.2.0
+
+# Caching
+django-cachalot==2.6.1
+
+# Database Optimization
+django-query-count==0.8.3
+
+# Static Files
+django-compressor==4.4
+
+# Minification
+django-htmlmin==0.11.0
+
+# Image Optimization
+django-imagekit==5.0.0
+
+# CDN Support
+django-storages[boto3]==1.14.2
+
+# Monitoring
+prometheus-client==0.19.0
+django-prometheus==2.3.1
