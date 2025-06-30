@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home - Telehealth Diabetes Care{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section bg-primary text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">
+                    <i class="fas fa-heartbeat me-3"></i>
+                    Diabetes Care at Your Fingertips
+                </h1>
+                <p class="lead mb-4">
+                    Connect with healthcare professionals, monitor your health, and manage your diabetes 
+                    from the comfort of your home with our comprehensive telehealth platform.
+                </p>
+                <div class="d-flex gap-3">
+                    <a href="{% url 'appointments:schedule' %}" class="btn btn-light btn-lg">
+                        <i class="fas fa-calendar-plus me-2"></i>Schedule Consultation
+                    </a>
+                    <a href="{% url 'education:about_diabetes' %}" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-book-medical me-2"></i>Learn More
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <img src="{% static 'images/hero-diabetes.jpg' %}" alt="Diabetes Care" class="img-fluid rounded shadow">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="display-5 fw-bold text-primary mb-3">Why Choose Our Platform?</h2>
+                <p class="lead text-muted">Comprehensive diabetes care designed with you in mind</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon bg-primary text-white rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                            <i class="fas fa-video fa-2x"></i>
+                        </div>
+                        <h4 class="card-title text-primary">Virtual Consultations</h4>
+                        <p class="card-text">Connect with certified diabetes specialists through secure video calls from anywhere.</p>
+                        <a href="{% url 'appointments:schedule' %}" class="btn btn-outline-primary">Book Now</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon bg-success text-white rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                            <i class="fas fa-chart-line fa-2x"></i>
+                        </div>
+                        <h4 class="card-title text-success">Remote Monitoring</h4>
+                        <p class="card-text">Track your glucose levels, medication, and vital signs with real-time data sharing.</p>
+                        <a href="{% url 'patients:monitoring' %}" class="btn btn-outline-success">Start Tracking</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon bg-info text-white rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                            <i class="fas fa-graduation-cap fa-2x"></i>
+                        </div>
+                        <h4 class="card-title text-info">Educational Resources</h4>
+                        <p class="card-text">Access comprehensive guides, meal plans, and exercise routines tailored for diabetes.</p>
+                        <a href="{% url 'education:about_diabetes' %}" class="btn btn-outline-info">Learn More</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Statistics Section -->
+<section class="bg-light py-5">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-3 mb-4">
+                <div class="stat-item">
+                    <h3 class="display-4 fw-bold text-primary">1000+</h3>
+                    <p class="text-muted">Patients Served</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="stat-item">
+                    <h3 class="display-4 fw-bold text-success">95%</h3>
+                    <p class="text-muted">Patient Satisfaction</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="stat-item">
+                    <h3 class="display-4 fw-bold text-info">24/7</h3>
+                    <p class="text-muted">Support Available</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="stat-item">
+                    <h3 class="display-4 fw-bold text-warning">50+</h3>
+                    <p class="text-muted">Healthcare Providers</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Services Overview -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 mb-4">
+                <h3 class="text-primary mb-3">
+                    <i class="fas fa-stethoscope me-2"></i>
+                    Comprehensive Care Services
+                </h3>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Type 1 & Type 2 Diabetes Management</li>
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Gestational Diabetes Support</li>
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Nutrition Counseling</li>
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Medication Management</li>
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Mental Health Support</li>
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Emergency Consultation</li>
+                </ul>
+            </div>
+            <div class="col-lg-6 mb-4">
+                <h3 class="text-primary mb-3">
+                    <i class="fas fa-mobile-alt me-2"></i>
+                    Technology Features
+                </h3>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>HIPAA-Compliant Platform</li>
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Mobile App Integration</li>
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Glucose Meter Sync</li>
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Secure Messaging</li>
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Appointment Reminders</li>
+                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Data Visualization</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="bg-primary text-white py-5">
+    <div class="container text-center">
+        <h2 class="display-5 fw-bold mb-3">Ready to Take Control of Your Diabetes?</h2>
+        <p class="lead mb-4">Join thousands of patients who trust our platform for their diabetes care.</p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{% url 'main:register' %}" class="btn btn-light btn-lg">
+                <i class="fas fa-user-plus me-2"></i>Get Started Today
+            </a>
+            <a href="{% url 'main:contact' %}" class="btn btn-outline-light btn-lg">
+                <i class="fas fa-phone me-2"></i>Contact Us
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}
