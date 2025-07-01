@@ -7,6 +7,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.utils.decorators import method_decorator
 from django.http import JsonResponse
 from django.contrib.auth.models import User
+from django.db.models import Q
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
@@ -22,7 +23,7 @@ from .forms import OptimizedUserCreationForm, OptimizedAuthenticationForm
 @never_cache
 @csrf_protect
 def register(request):
-    """Super-fast user registration view"""
+    """Ultra-fast user registration view"""
     if request.user.is_authenticated:
         return redirect('patients:dashboard')
 
@@ -34,48 +35,36 @@ def register(request):
         password1 = request.POST.get('password1', '')
         password2 = request.POST.get('password2', '')
 
-        # Quick validation
-        errors = []
-        if not username:
-            errors.append('Username is required.')
-        elif User.objects.filter(username=username).exists():
-            errors.append('Username already exists.')
-
-        if not email:
-            errors.append('Email is required.')
-        elif User.objects.filter(email=email).exists():
-            errors.append('Email already exists.')
-
-        if not password1:
-            errors.append('Password is required.')
+        # Ultra-fast validation - minimal checks
+        if not username or not email or not password1:
+            messages.error(request, 'All fields are required.')
         elif password1 != password2:
-            errors.append('Passwords do not match.')
-        elif len(password1) < 3:  # Minimal validation for speed
-            errors.append('Password too short.')
-
-        if errors:
-            for error in errors:
-                messages.error(request, error)
+            messages.error(request, 'Passwords do not match.')
+        elif len(password1) < 3:
+            messages.error(request, 'Password too short.')
         else:
             try:
-                # Create user directly for speed
-                user = User.objects.create_user(
-                    username=username,
-                    email=email,
-                    password=password1,
-                    first_name=first_name,
-                    last_name=last_name
-                )
+                # Check for existing users with single query
+                if User.objects.filter(Q(username=username) | Q(email=email)).exists():
+                    messages.error(request, 'Username or email already exists.')
+                else:
+                    # Create user directly for speed
+                    user = User.objects.create_user(
+                        username=username,
+                        email=email,
+                        password=password1,
+                        first_name=first_name,
+                        last_name=last_name
+                    )
 
-                # Quick login
-                user.backend = 'django.contrib.auth.backends.ModelBackend'
-                login(request, user)
+                    # Quick login without messages
+                    user.backend = 'django.contrib.auth.backends.ModelBackend'
+                    login(request, user)
 
-                messages.success(request, f'Welcome {first_name}! Your account has been created successfully.')
-                return redirect('/patients/dashboard/')
+                    return redirect('/patients/dashboard/')
 
             except Exception as e:
-                messages.error(request, f'Registration failed: {str(e)}')
+                messages.error(request, 'Registration failed. Please try again.')
 
     # Simple form context
     context = {
@@ -91,7 +80,7 @@ def register(request):
 @never_cache
 @csrf_protect
 def fast_login(request):
-    """Super-fast login view with minimal processing"""
+    """Ultra-fast login view with minimal processing"""
     if request.user.is_authenticated:
         return redirect('patients:dashboard')
 
@@ -101,8 +90,10 @@ def fast_login(request):
 
         if username and password:
             try:
-                # Direct database lookup for speed
-                user = User.objects.get(username=username)
+                # Direct database lookup for speed - only get necessary fields
+                user = User.objects.only('id', 'username', 'password', 'first_name', 'is_active').get(
+                    username=username, is_active=True
+                )
 
                 # Quick password check
                 if check_password(password, user.password):
@@ -110,24 +101,18 @@ def fast_login(request):
                     user.backend = 'django.contrib.auth.backends.ModelBackend'
                     login(request, user)
 
-                    messages.success(request, f'Welcome back, {user.first_name or username}!')
-
-                    # Quick redirect
+                    # Skip messages for speed - just redirect
                     next_page = request.GET.get('next', '/patients/dashboard/')
                     return redirect(next_page)
                 else:
-                    messages.error(request, 'Invalid password.')
+                    messages.error(request, 'Invalid credentials.')
             except User.DoesNotExist:
-                messages.error(request, 'User not found.')
+                messages.error(request, 'Invalid credentials.')
         else:
             messages.error(request, 'Please enter both username and password.')
 
-    # Simple form context
-    context = {
-        'form': {'username': '', 'password': ''},
-        'debug': True  # For development
-    }
-    return render(request, 'accounts/fast_login.html', context)
+    # Minimal context for speed
+    return render(request, 'accounts/fast_login.html', {'debug': True})
 
 @login_required
 def profile(request):
@@ -272,3 +257,8 @@ def reset_password(request, uidb64, token):
         return render(request, 'accounts/reset_password.html', {
             'validlink': False
         })
+
+
+def login_speed_test(request):
+    """Login speed test page"""
+    return render(request, 'accounts/login_speed_test.html')

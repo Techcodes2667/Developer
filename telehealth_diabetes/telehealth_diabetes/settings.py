@@ -99,6 +99,11 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+        'OPTIONS': {
+            'timeout': 20,
+            'check_same_thread': False,
+        },
+        'CONN_MAX_AGE': 600,  # Keep connections alive for 10 minutes
     }
 }
 
@@ -110,6 +115,12 @@ DATABASES = {
 if DEBUG:
     # NO password validation for development (maximum speed)
     AUTH_PASSWORD_VALIDATORS = []
+
+    # Fast password hashing for development
+    PASSWORD_HASHERS = [
+        'django.contrib.auth.hashers.MD5PasswordHasher',  # Fastest for development
+        'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    ]
 else:
     # Full validators for production only
     AUTH_PASSWORD_VALIDATORS = [
@@ -130,6 +141,33 @@ else:
         },
     ]
 
+    # Secure password hashing for production
+    PASSWORD_HASHERS = [
+        'django.contrib.auth.hashers.Argon2PasswordHasher',
+        'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+        'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+        'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+    ]
+
+
+# Session Configuration for Performance
+SESSION_COOKIE_AGE = 86400  # 24 hours
+SESSION_SAVE_EVERY_REQUEST = False  # Don't save session on every request
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
+# Cache Configuration for Development Speed
+if DEBUG:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'unique-snowflake',
+            'TIMEOUT': 300,
+            'OPTIONS': {
+                'MAX_ENTRIES': 1000,
+                'CULL_FREQUENCY': 3,
+            }
+        }
+    }
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/

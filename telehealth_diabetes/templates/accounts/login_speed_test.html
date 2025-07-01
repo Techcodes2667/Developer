@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Speed Test - Telehealth Diabetes Care</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .speed-test-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .test-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+        .metric {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+        }
+        .fast { color: #28a745; }
+        .medium { color: #ffc107; }
+        .slow { color: #dc3545; }
+    </style>
+</head>
+<body>
+    <div class="speed-test-container d-flex align-items-center">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6">
+                    <div class="test-card p-4">
+                        <div class="text-center mb-4">
+                            <h2 class="text-primary">🚀 Login Speed Test</h2>
+                            <p class="text-muted">Test the optimized authentication system</p>
+                        </div>
+
+                        <!-- Speed Test Form -->
+                        <form id="speedTestForm">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="testUsername" class="form-label">Username</label>
+                                    <input type="text" class="form-control" id="testUsername" value="demo" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="testPassword" class="form-label">Password</label>
+                                    <input type="password" class="form-control" id="testPassword" value="demo123" required>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="testIterations" class="form-label">Test Iterations</label>
+                                    <select class="form-select" id="testIterations">
+                                        <option value="1">1 (Quick Test)</option>
+                                        <option value="5" selected>5 (Standard)</option>
+                                        <option value="10">10 (Thorough)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary w-100" id="startTestBtn">
+                                        <i class="fas fa-play me-2"></i>Start Speed Test
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <!-- Test Results -->
+                        <div id="testResults" style="display: none;">
+                            <hr>
+                            <h5 class="text-center mb-3">📊 Test Results</h5>
+                            
+                            <div class="metric">
+                                <div class="d-flex justify-content-between">
+                                    <span><strong>Average Login Time:</strong></span>
+                                    <span id="avgTime" class="fw-bold"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="metric">
+                                <div class="d-flex justify-content-between">
+                                    <span><strong>Fastest Login:</strong></span>
+                                    <span id="minTime" class="fw-bold"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="metric">
+                                <div class="d-flex justify-content-between">
+                                    <span><strong>Slowest Login:</strong></span>
+                                    <span id="maxTime" class="fw-bold"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="metric">
+                                <div class="d-flex justify-content-between">
+                                    <span><strong>Performance Rating:</strong></span>
+                                    <span id="rating" class="fw-bold"></span>
+                                </div>
+                            </div>
+                            
+                            <div id="recommendations" class="mt-3"></div>
+                        </div>
+
+                        <!-- Test Progress -->
+                        <div id="testProgress" style="display: none;">
+                            <hr>
+                            <div class="text-center">
+                                <div class="spinner-border text-primary mb-2" role="status">
+                                    <span class="visually-hidden">Testing...</span>
+                                </div>
+                                <div>
+                                    <strong>Running Speed Test...</strong>
+                                </div>
+                                <div class="text-muted">
+                                    Test <span id="currentTest">1</span> of <span id="totalTests">5</span>
+                                </div>
+                                <div class="progress mt-2">
+                                    <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <div class="mt-4">
+                            <div class="row">
+                                <div class="col-6">
+                                    <a href="/accounts/fast-login/" class="btn btn-outline-primary w-100">
+                                        <i class="fas fa-sign-in-alt me-2"></i>Fast Login
+                                    </a>
+                                </div>
+                                <div class="col-6">
+                                    <a href="/accounts/login/" class="btn btn-outline-secondary w-100">
+                                        <i class="fas fa-user me-2"></i>Regular Login
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <script>
+        document.getElementById('speedTestForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('testUsername').value;
+            const password = document.getElementById('testPassword').value;
+            const iterations = parseInt(document.getElementById('testIterations').value);
+            
+            // Show progress
+            document.getElementById('testResults').style.display = 'none';
+            document.getElementById('testProgress').style.display = 'block';
+            document.getElementById('startTestBtn').disabled = true;
+            document.getElementById('totalTests').textContent = iterations;
+            
+            const times = [];
+            
+            for (let i = 0; i < iterations; i++) {
+                document.getElementById('currentTest').textContent = i + 1;
+                document.getElementById('progressBar').style.width = ((i + 1) / iterations * 100) + '%';
+                
+                const startTime = performance.now();
+                
+                try {
+                    const response = await fetch('/accounts/fast-login/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
+                    });
+                    
+                    const endTime = performance.now();
+                    const loginTime = endTime - startTime;
+                    times.push(loginTime);
+                    
+                    // Small delay between tests
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    
+                } catch (error) {
+                    console.error('Test failed:', error);
+                }
+            }
+            
+            // Calculate results
+            const avgTime = times.reduce((a, b) => a + b, 0) / times.length;
+            const minTime = Math.min(...times);
+            const maxTime = Math.max(...times);
+            
+            // Display results
+            document.getElementById('testProgress').style.display = 'none';
+            document.getElementById('testResults').style.display = 'block';
+            document.getElementById('startTestBtn').disabled = false;
+            
+            document.getElementById('avgTime').textContent = avgTime.toFixed(2) + 'ms';
+            document.getElementById('minTime').textContent = minTime.toFixed(2) + 'ms';
+            document.getElementById('maxTime').textContent = maxTime.toFixed(2) + 'ms';
+            
+            // Performance rating
+            let rating, ratingClass, recommendations;
+            if (avgTime < 100) {
+                rating = '🚀 EXCELLENT';
+                ratingClass = 'fast';
+                recommendations = '<div class="alert alert-success">✅ Login performance is excellent! The optimizations are working perfectly.</div>';
+            } else if (avgTime < 300) {
+                rating = '✅ GOOD';
+                ratingClass = 'medium';
+                recommendations = '<div class="alert alert-info">ℹ️ Login performance is good. Consider further optimizations for even better speed.</div>';
+            } else if (avgTime < 1000) {
+                rating = '⚠️ SLOW';
+                ratingClass = 'medium';
+                recommendations = '<div class="alert alert-warning">⚠️ Login is slower than optimal. Check password hashing and database queries.</div>';
+            } else {
+                rating = '❌ VERY SLOW';
+                ratingClass = 'slow';
+                recommendations = '<div class="alert alert-danger">❌ Login is very slow. Immediate optimization needed.</div>';
+            }
+            
+            document.getElementById('rating').textContent = rating;
+            document.getElementById('rating').className = `fw-bold ${ratingClass}`;
+            document.getElementById('recommendations').innerHTML = recommendations;
+        });
+        
+        // Helper function to get CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>

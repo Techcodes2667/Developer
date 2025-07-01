@@ -14,6 +14,7 @@ urlpatterns = [
     # Password reset views
     path('forgot-password/', views.forgot_password, name='forgot_password'),
     path('reset-password/<uidb64>/<token>/', views.reset_password, name='reset_password'),
+    path('speed-test/', views.login_speed_test, name='login_speed_test'),
 
     # Alternative fast views
     path('fast-login/', views.fast_login, name='fast_login'),
