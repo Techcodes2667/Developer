@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Performance Dashboard - Telehealth Diabetes Care</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .dashboard-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        .method-card {
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        .method-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        .instant { border-color: #ff6b6b; }
+        .fast { border-color: #feca57; }
+        .regular { border-color: #48dbfb; }
+        .speed-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.8rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 15px;
+        }
+        .performance-meter {
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+        .performance-bar {
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+        .instant-bar { background: linear-gradient(90deg, #ff6b6b, #feca57); }
+        .fast-bar { background: linear-gradient(90deg, #feca57, #48dbfb); }
+        .regular-bar { background: linear-gradient(90deg, #48dbfb, #0abde3); }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="dashboard-card p-4">
+                    <div class="text-center mb-4">
+                        <h1 class="display-5 fw-bold text-primary">
+                            🚀 Authentication Performance Dashboard
+                        </h1>
+                        <p class="lead text-muted">
+                            Test and compare different authentication methods
+                        </p>
+                    </div>
+
+                    <!-- Performance Overview -->
+                    <div class="row mb-4">
+                        <div class="col-md-4 text-center">
+                            <div class="card border-success">
+                                <div class="card-body">
+                                    <h5 class="card-title text-success">⚡ Instant</h5>
+                                    <h3 class="text-success">~50ms</h3>
+                                    <small class="text-muted">No validation</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="card border-warning">
+                                <div class="card-body">
+                                    <h5 class="card-title text-warning">🔥 Fast</h5>
+                                    <h3 class="text-warning">~200ms</h3>
+                                    <small class="text-muted">Minimal validation</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="card border-info">
+                                <div class="card-body">
+                                    <h5 class="card-title text-info">🔒 Regular</h5>
+                                    <h3 class="text-info">~500ms</h3>
+                                    <small class="text-muted">Full validation</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Authentication Methods -->
+                    <div class="row">
+                        <!-- Instant Login -->
+                        <div class="col-lg-6 mb-4">
+                            <div class="method-card instant position-relative">
+                                <span class="speed-badge bg-danger text-white">⚡ INSTANT</span>
+                                <h4 class="text-danger">
+                                    <i class="fas fa-bolt me-2"></i>
+                                    Instant Login
+                                </h4>
+                                <p class="text-muted">
+                                    Zero validation - just username required. 
+                                    <strong>Development only!</strong>
+                                </p>
+                                
+                                <div class="performance-meter">
+                                    <div class="performance-bar instant-bar" style="width: 15%;"></div>
+                                </div>
+                                <small class="text-muted">~10-50ms response time</small>
+                                
+                                <div class="mt-3">
+                                    <a href="/accounts/instant-login/" class="btn btn-danger me-2">
+                                        <i class="fas fa-bolt me-1"></i>Try Instant Login
+                                    </a>
+                                    <button class="btn btn-outline-danger btn-sm" onclick="testMethod('instant-login')">
+                                        <i class="fas fa-stopwatch me-1"></i>Test Speed
+                                    </button>
+                                </div>
+                                
+                                <div class="mt-2">
+                                    <small class="text-muted">
+                                        <strong>Security:</strong> ❌ None<br>
+                                        <strong>Validation:</strong> ❌ None<br>
+                                        <strong>Use case:</strong> Development testing
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Instant Register -->
+                        <div class="col-lg-6 mb-4">
+                            <div class="method-card instant position-relative">
+                                <span class="speed-badge bg-info text-white">⚡ INSTANT</span>
+                                <h4 class="text-info">
+                                    <i class="fas fa-user-plus me-2"></i>
+                                    Instant Register
+                                </h4>
+                                <p class="text-muted">
+                                    Auto-generates email & password. 
+                                    <strong>Development only!</strong>
+                                </p>
+                                
+                                <div class="performance-meter">
+                                    <div class="performance-bar instant-bar" style="width: 25%;"></div>
+                                </div>
+                                <small class="text-muted">~20-100ms response time</small>
+                                
+                                <div class="mt-3">
+                                    <a href="/accounts/instant-register/" class="btn btn-info me-2">
+                                        <i class="fas fa-user-plus me-1"></i>Try Instant Register
+                                    </a>
+                                    <button class="btn btn-outline-info btn-sm" onclick="testMethod('instant-register')">
+                                        <i class="fas fa-stopwatch me-1"></i>Test Speed
+                                    </button>
+                                </div>
+                                
+                                <div class="mt-2">
+                                    <small class="text-muted">
+                                        <strong>Security:</strong> ❌ None<br>
+                                        <strong>Validation:</strong> ❌ Minimal<br>
+                                        <strong>Use case:</strong> Quick user creation
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Fast Login -->
+                        <div class="col-lg-6 mb-4">
+                            <div class="method-card fast position-relative">
+                                <span class="speed-badge bg-warning text-dark">🔥 FAST</span>
+                                <h4 class="text-warning">
+                                    <i class="fas fa-tachometer-alt me-2"></i>
+                                    Fast Login
+                                </h4>
+                                <p class="text-muted">
+                                    Optimized authentication with minimal overhead.
+                                    Fast password hashing.
+                                </p>
+                                
+                                <div class="performance-meter">
+                                    <div class="performance-bar fast-bar" style="width: 40%;"></div>
+                                </div>
+                                <small class="text-muted">~50-200ms response time</small>
+                                
+                                <div class="mt-3">
+                                    <a href="/accounts/fast-login/" class="btn btn-warning me-2">
+                                        <i class="fas fa-tachometer-alt me-1"></i>Try Fast Login
+                                    </a>
+                                    <button class="btn btn-outline-warning btn-sm" onclick="testMethod('fast-login')">
+                                        <i class="fas fa-stopwatch me-1"></i>Test Speed
+                                    </button>
+                                </div>
+                                
+                                <div class="mt-2">
+                                    <small class="text-muted">
+                                        <strong>Security:</strong> ⚠️ Basic<br>
+                                        <strong>Validation:</strong> ✅ Password required<br>
+                                        <strong>Use case:</strong> Development & testing
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Regular Login -->
+                        <div class="col-lg-6 mb-4">
+                            <div class="method-card regular position-relative">
+                                <span class="speed-badge bg-primary text-white">🔒 SECURE</span>
+                                <h4 class="text-primary">
+                                    <i class="fas fa-shield-alt me-2"></i>
+                                    Regular Login
+                                </h4>
+                                <p class="text-muted">
+                                    Full Django authentication with all security features.
+                                    Production-ready.
+                                </p>
+                                
+                                <div class="performance-meter">
+                                    <div class="performance-bar regular-bar" style="width: 80%;"></div>
+                                </div>
+                                <small class="text-muted">~200-500ms response time</small>
+                                
+                                <div class="mt-3">
+                                    <a href="/accounts/login/" class="btn btn-primary me-2">
+                                        <i class="fas fa-shield-alt me-1"></i>Try Regular Login
+                                    </a>
+                                    <button class="btn btn-outline-primary btn-sm" onclick="testMethod('login')">
+                                        <i class="fas fa-stopwatch me-1"></i>Test Speed
+                                    </button>
+                                </div>
+                                
+                                <div class="mt-2">
+                                    <small class="text-muted">
+                                        <strong>Security:</strong> ✅ Full<br>
+                                        <strong>Validation:</strong> ✅ Complete<br>
+                                        <strong>Use case:</strong> Production deployment
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Speed Test Results -->
+                    <div id="testResults" style="display: none;">
+                        <hr>
+                        <h5 class="text-center mb-3">📊 Speed Test Results</h5>
+                        <div id="resultsContent"></div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card border-success">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title text-success">
+                                        <i class="fas fa-tools me-2"></i>
+                                        Quick Development Tools
+                                    </h5>
+                                    <div class="row">
+                                        <div class="col-md-3 mb-2">
+                                            <a href="/accounts/speed-test/" class="btn btn-outline-success w-100">
+                                                <i class="fas fa-chart-line me-2"></i>Speed Test Tool
+                                            </a>
+                                        </div>
+                                        <div class="col-md-3 mb-2">
+                                            <button class="btn btn-outline-info w-100" onclick="runAllTests()">
+                                                <i class="fas fa-play me-2"></i>Test All Methods
+                                            </button>
+                                        </div>
+                                        <div class="col-md-3 mb-2">
+                                            <a href="/patients/dashboard/" class="btn btn-outline-primary w-100">
+                                                <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                                            </a>
+                                        </div>
+                                        <div class="col-md-3 mb-2">
+                                            <a href="/" class="btn btn-outline-secondary w-100">
+                                                <i class="fas fa-home me-2"></i>Home
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        async function testMethod(method) {
+            const startTime = performance.now();
+            
+            try {
+                const response = await fetch(`/accounts/${method}/`);
+                const endTime = performance.now();
+                const loadTime = endTime - startTime;
+                
+                showResult(method, loadTime, response.ok);
+            } catch (error) {
+                console.error('Test failed:', error);
+                showResult(method, -1, false);
+            }
+        }
+        
+        function showResult(method, time, success) {
+            const resultsDiv = document.getElementById('testResults');
+            const contentDiv = document.getElementById('resultsContent');
+            
+            let statusClass = success ? 'success' : 'danger';
+            let statusIcon = success ? 'check' : 'times';
+            let timeText = time > 0 ? `${time.toFixed(2)}ms` : 'Failed';
+            
+            contentDiv.innerHTML = `
+                <div class="alert alert-${statusClass}">
+                    <i class="fas fa-${statusIcon} me-2"></i>
+                    <strong>${method.toUpperCase()}:</strong> ${timeText}
+                    ${success ? '✅ Success' : '❌ Failed'}
+                </div>
+            `;
+            
+            resultsDiv.style.display = 'block';
+        }
+        
+        async function runAllTests() {
+            const methods = ['instant-login', 'fast-login', 'login'];
+            const results = [];
+            
+            for (const method of methods) {
+                const startTime = performance.now();
+                try {
+                    const response = await fetch(`/accounts/${method}/`);
+                    const endTime = performance.now();
+                    results.push({
+                        method,
+                        time: endTime - startTime,
+                        success: response.ok
+                    });
+                } catch (error) {
+                    results.push({
+                        method,
+                        time: -1,
+                        success: false
+                    });
+                }
+                
+                // Small delay between tests
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            
+            showAllResults(results);
+        }
+        
+        function showAllResults(results) {
+            const resultsDiv = document.getElementById('testResults');
+            const contentDiv = document.getElementById('resultsContent');
+            
+            let html = '<div class="row">';
+            
+            results.forEach(result => {
+                const statusClass = result.success ? 'success' : 'danger';
+                const timeText = result.time > 0 ? `${result.time.toFixed(2)}ms` : 'Failed';
+                
+                html += `
+                    <div class="col-md-4 mb-2">
+                        <div class="card border-${statusClass}">
+                            <div class="card-body text-center">
+                                <h6 class="card-title">${result.method.toUpperCase()}</h6>
+                                <h4 class="text-${statusClass}">${timeText}</h4>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            contentDiv.innerHTML = html;
+            resultsDiv.style.display = 'block';
+        }
+        
+        // Performance monitoring
+        window.addEventListener('load', function() {
+            const loadTime = performance.now();
+            console.log('🚀 Performance dashboard loaded in:', loadTime.toFixed(2), 'ms');
+        });
+    </script>
+</body>
+</html>

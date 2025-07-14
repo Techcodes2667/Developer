@@ -69,8 +69,8 @@ def group_list(request):
             Q(tags__icontains=search)
         )
 
-    # Order by member count and featured status
-    groups = groups.order_by('-is_featured', '-member_count', '-created_at')
+    # Order by member count and creation date
+    groups = groups.order_by('-member_count', '-created_at')
 
     # Pagination
     paginator = Paginator(groups, 12)
@@ -94,7 +94,7 @@ def group_list(request):
         'user_groups': user_groups,
         'category': category,
         'search': search,
-        'categories': SupportGroup.CATEGORY_CHOICES,
+        'categories': SupportGroup.GROUP_TYPES,
     }
 
     return render(request, 'support_groups/list.html', context)

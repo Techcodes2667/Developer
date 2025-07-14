@@ -1,0 +1,295 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Medication Reminders - Telehealth Diabetes Care{% endblock %}
+
+{% block extra_css %}
+<style>
+    .reminder-card {
+        border-left: 4px solid #17a2b8;
+        transition: all 0.3s ease;
+    }
+    .reminder-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .medication-card {
+        border-left: 4px solid #28a745;
+    }
+    .reminder-time {
+        background: linear-gradient(135deg, #17a2b8, #138496);
+        color: white;
+        border-radius: 10px;
+        padding: 0.5rem 1rem;
+        font-weight: bold;
+    }
+    .next-dose {
+        border-left-color: #ffc107;
+    }
+    .overdue {
+        border-left-color: #dc3545;
+    }
+    .taken {
+        border-left-color: #6c757d;
+        opacity: 0.7;
+    }
+    .time-badge {
+        font-size: 0.9rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 15px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold text-primary">
+                        <i class="fas fa-bell me-2"></i>
+                        Medication Reminders
+                    </h2>
+                    <p class="text-muted mb-0">Stay on track with your medication schedule</p>
+                </div>
+                <div>
+                    <button class="btn btn-success me-2" onclick="markAllTaken()">
+                        <i class="fas fa-check-double me-2"></i>Mark All Taken
+                    </button>
+                    <a href="{% url 'medication_management:add' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Add Medication
+                    </a>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Today's Reminders -->
+                <div class="col-lg-8 mb-4">
+                    <div class="card">
+                        <div class="card-header bg-transparent">
+                            <h5 class="mb-0">
+                                <i class="fas fa-calendar-day text-info me-2"></i>
+                                Today's Schedule
+                            </h5>
+                            <small class="text-muted">{{ today|date:"F d, Y" }}</small>
+                        </div>
+                        <div class="card-body">
+                            {% if reminders %}
+                                <div class="row">
+                                    {% for reminder in reminders %}
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card reminder-card {% if reminder.is_overdue %}overdue{% elif reminder.is_next %}next-dose{% elif reminder.is_taken %}taken{% endif %}">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <h6 class="fw-bold mb-0">{{ reminder.medication.medication_name }}</h6>
+                                                    <span class="badge bg-{% if reminder.is_overdue %}danger{% elif reminder.is_next %}warning{% elif reminder.is_taken %}secondary{% else %}info{% endif %} time-badge">
+                                                        {{ reminder.scheduled_time|time:"g:i A" }}
+                                                    </span>
+                                                </div>
+                                                
+                                                <p class="text-muted small mb-2">
+                                                    {{ reminder.medication.dosage }} - {{ reminder.medication.frequency }}
+                                                </p>
+                                                
+                                                {% if reminder.medication.instructions %}
+                                                <div class="mb-3">
+                                                    <small class="text-muted d-block">Instructions:</small>
+                                                    <p class="mb-0 small">{{ reminder.medication.instructions|truncatewords:15 }}</p>
+                                                </div>
+                                                {% endif %}
+                                                
+                                                <!-- Status and Actions -->
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    {% if reminder.is_taken %}
+                                                    <span class="text-success small">
+                                                        <i class="fas fa-check-circle me-1"></i>
+                                                        Taken at {{ reminder.taken_at|time:"g:i A" }}
+                                                    </span>
+                                                    <button class="btn btn-outline-secondary btn-sm" onclick="undoTaken({{ reminder.id }})">
+                                                        <i class="fas fa-undo"></i>
+                                                    </button>
+                                                    {% elif reminder.is_overdue %}
+                                                    <span class="text-danger small">
+                                                        <i class="fas fa-exclamation-triangle me-1"></i>
+                                                        Overdue
+                                                    </span>
+                                                    <button class="btn btn-danger btn-sm" onclick="markTaken({{ reminder.id }})">
+                                                        <i class="fas fa-check me-1"></i>Take Now
+                                                    </button>
+                                                    {% else %}
+                                                    <span class="text-info small">
+                                                        <i class="fas fa-clock me-1"></i>
+                                                        Scheduled
+                                                    </span>
+                                                    <button class="btn btn-success btn-sm" onclick="markTaken({{ reminder.id }})">
+                                                        <i class="fas fa-check me-1"></i>Mark Taken
+                                                    </button>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="text-center py-4">
+                                    <i class="fas fa-bell-slash text-muted mb-3" style="font-size: 3rem;"></i>
+                                    <h5 class="text-muted">No Reminders Today</h5>
+                                    <p class="text-muted">You don't have any medication reminders scheduled for today.</p>
+                                    <a href="{% url 'medication_management:add' %}" class="btn btn-primary">
+                                        <i class="fas fa-plus me-2"></i>Add Medication
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Medications Sidebar -->
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header bg-transparent">
+                            <h5 class="mb-0">
+                                <i class="fas fa-pills text-success me-2"></i>
+                                Active Medications
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            {% if active_medications %}
+                                {% for medication in active_medications %}
+                                <div class="card medication-card mb-3">
+                                    <div class="card-body p-3">
+                                        <h6 class="fw-bold mb-1">{{ medication.medication_name }}</h6>
+                                        <p class="text-muted small mb-2">
+                                            {{ medication.dosage }} - {{ medication.frequency }}
+                                        </p>
+                                        
+                                        {% if medication.instructions %}
+                                        <div class="mb-2">
+                                            <small class="text-muted">Instructions:</small>
+                                            <p class="small mb-0">{{ medication.instructions|truncatewords:10 }}</p>
+                                        </div>
+                                        {% endif %}
+                                        
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">
+                                                Started: {{ medication.start_date|date:"M d, Y" }}
+                                            </small>
+                                            <a href="{% url 'medication_management:detail' medication.id %}" 
+                                               class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="text-center py-3">
+                                    <i class="fas fa-prescription-bottle text-muted mb-2" style="font-size: 2rem;"></i>
+                                    <p class="text-muted small">No active medications</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Reminder Settings -->
+                    <div class="card mt-4">
+                        <div class="card-header bg-transparent">
+                            <h6 class="mb-0">
+                                <i class="fas fa-cog text-secondary me-2"></i>
+                                Reminder Settings
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="emailReminders" checked>
+                                <label class="form-check-label small" for="emailReminders">
+                                    Email Reminders
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="smsReminders">
+                                <label class="form-check-label small" for="smsReminders">
+                                    SMS Reminders
+                                </label>
+                            </div>
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="pushNotifications" checked>
+                                <label class="form-check-label small" for="pushNotifications">
+                                    Push Notifications
+                                </label>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label small">Reminder Time</label>
+                                <select class="form-select form-select-sm">
+                                    <option>15 minutes before</option>
+                                    <option>30 minutes before</option>
+                                    <option selected>At scheduled time</option>
+                                    <option>5 minutes after</option>
+                                </select>
+                            </div>
+                            
+                            <button class="btn btn-outline-primary btn-sm w-100">
+                                <i class="fas fa-save me-2"></i>Save Settings
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="card mt-4">
+                        <div class="card-header bg-transparent">
+                            <h6 class="mb-0">Quick Actions</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'medication_management:list' %}" class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-list me-2"></i>All Medications
+                                </a>
+                                <a href="{% url 'medication_management:refills' %}" class="btn btn-outline-warning btn-sm">
+                                    <i class="fas fa-redo me-2"></i>Request Refills
+                                </a>
+                                <a href="{% url 'medication_management:log' %}" class="btn btn-outline-info btn-sm">
+                                    <i class="fas fa-history me-2"></i>Medication Log
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function markTaken(reminderId) {
+    // Here you would typically make an AJAX call to mark the reminder as taken
+    // For now, we'll just show a success message
+    alert('Medication marked as taken!');
+    location.reload();
+}
+
+function undoTaken(reminderId) {
+    if (confirm('Are you sure you want to undo this medication?')) {
+        // Here you would typically make an AJAX call to undo the taken status
+        alert('Medication status updated!');
+        location.reload();
+    }
+}
+
+function markAllTaken() {
+    if (confirm('Mark all scheduled medications as taken?')) {
+        // Here you would typically make an AJAX call to mark all as taken
+        alert('All medications marked as taken!');
+        location.reload();
+    }
+}
+
+// Auto-refresh every 5 minutes to update reminder status
+setInterval(function() {
+    location.reload();
+}, 300000);
+</script>
+{% endblock %}

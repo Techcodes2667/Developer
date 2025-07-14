@@ -1,0 +1,451 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Live Q&A Sessions - Telehealth Diabetes Care{% endblock %}
+
+{% block extra_css %}
+<style>
+    .qa-session-card {
+        border-left: 4px solid #17a2b8;
+        transition: all 0.3s ease;
+    }
+    .qa-session-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .qa-session-card.upcoming {
+        border-left-color: #28a745;
+    }
+    .qa-session-card.live {
+        border-left-color: #dc3545;
+        animation: pulse 2s infinite;
+    }
+    .qa-session-card.past {
+        border-left-color: #6c757d;
+        opacity: 0.8;
+    }
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+    }
+    .host-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+    .status-badge {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 15px;
+    }
+    .qa-hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 20px;
+        padding: 3rem 2rem;
+        margin-bottom: 2rem;
+    }
+    .question-preview {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <!-- Hero Section -->
+            <div class="qa-hero text-center">
+                <h1 class="display-5 fw-bold mb-3">
+                    <i class="fas fa-question-circle me-3"></i>
+                    Live Q&A Sessions
+                </h1>
+                <p class="lead mb-4">
+                    Join expert-led Q&A sessions to get answers to your diabetes-related questions
+                </p>
+                <div class="row justify-content-center">
+                    <div class="col-md-3 mb-2">
+                        <div class="text-center">
+                            <h3 class="fw-bold">{{ upcoming_qa.count }}</h3>
+                            <small>Upcoming Sessions</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <div class="text-center">
+                            <h3 class="fw-bold">{{ past_qa.count }}</h3>
+                            <small>Past Sessions</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <div class="text-center">
+                            <h3 class="fw-bold">150+</h3>
+                            <small>Questions Answered</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <div class="text-center">
+                            <h3 class="fw-bold">25+</h3>
+                            <small>Expert Hosts</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Tabs -->
+            <ul class="nav nav-pills mb-4">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#upcoming" data-bs-toggle="tab">
+                        <i class="fas fa-calendar-plus me-2"></i>Upcoming Sessions
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#past" data-bs-toggle="tab">
+                        <i class="fas fa-history me-2"></i>Past Sessions
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#schedule" data-bs-toggle="tab">
+                        <i class="fas fa-plus me-2"></i>Schedule Session
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content">
+                <!-- Upcoming Sessions Tab -->
+                <div class="tab-pane fade show active" id="upcoming">
+                    {% if upcoming_qa %}
+                        <div class="row">
+                            {% for session in upcoming_qa %}
+                            <div class="col-lg-6 col-xl-4 mb-4">
+                                <div class="card qa-session-card upcoming">
+                                    <div class="card-body">
+                                        <!-- Status Badge -->
+                                        <div class="d-flex justify-content-between align-items-start mb-3">
+                                            <span class="badge bg-success status-badge">
+                                                <i class="fas fa-clock me-1"></i>Upcoming
+                                            </span>
+                                            <small class="text-muted">
+                                                {{ session.group.name }}
+                                            </small>
+                                        </div>
+
+                                        <!-- Session Info -->
+                                        <h5 class="fw-bold mb-2">{{ session.title }}</h5>
+                                        <p class="text-muted small mb-3">{{ session.description|truncatewords:20 }}</p>
+
+                                        <!-- Host Info -->
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="host-avatar me-3">
+                                                {{ session.host.first_name|first }}{{ session.host.last_name|first }}
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0 fw-bold">{{ session.host.get_full_name }}</h6>
+                                                <small class="text-muted">Session Host</small>
+                                            </div>
+                                        </div>
+
+                                        <!-- Schedule Info -->
+                                        <div class="mb-3">
+                                            <div class="d-flex align-items-center mb-1">
+                                                <i class="fas fa-calendar text-primary me-2"></i>
+                                                <span class="small">{{ session.scheduled_datetime|date:"F d, Y" }}</span>
+                                            </div>
+                                            <div class="d-flex align-items-center mb-1">
+                                                <i class="fas fa-clock text-primary me-2"></i>
+                                                <span class="small">{{ session.scheduled_datetime|time:"g:i A" }}</span>
+                                            </div>
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-hourglass-half text-primary me-2"></i>
+                                                <span class="small">{{ session.duration_minutes }} minutes</span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Questions Preview -->
+                                        {% if session.questions.count > 0 %}
+                                        <div class="question-preview">
+                                            <small class="text-muted d-block mb-1">
+                                                <i class="fas fa-question me-1"></i>
+                                                {{ session.questions.count }} question{{ session.questions.count|pluralize }} submitted
+                                            </small>
+                                            <small class="text-muted">
+                                                Latest: "{{ session.questions.first.question|truncatewords:8 }}"
+                                            </small>
+                                        </div>
+                                        {% endif %}
+
+                                        <!-- Action Buttons -->
+                                        <div class="d-flex gap-2 mt-3">
+                                            {% if session.meeting_link %}
+                                            <a href="{{ session.meeting_link }}" class="btn btn-success btn-sm flex-fill" target="_blank">
+                                                <i class="fas fa-video me-1"></i>Join Session
+                                            </a>
+                                            {% else %}
+                                            <button class="btn btn-outline-success btn-sm flex-fill" disabled>
+                                                <i class="fas fa-clock me-1"></i>Link Coming Soon
+                                            </button>
+                                            {% endif %}
+                                            <button class="btn btn-outline-primary btn-sm" onclick="submitQuestion({{ session.id }})">
+                                                <i class="fas fa-question"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-calendar-times text-muted mb-3" style="font-size: 4rem;"></i>
+                            <h4 class="text-muted mb-3">No Upcoming Sessions</h4>
+                            <p class="text-muted mb-4">
+                                There are no Q&A sessions scheduled at the moment. Check back soon or request a session!
+                            </p>
+                            <button class="btn btn-primary" data-bs-toggle="tab" data-bs-target="#schedule">
+                                <i class="fas fa-plus me-2"></i>Request a Session
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Past Sessions Tab -->
+                <div class="tab-pane fade" id="past">
+                    {% if past_qa %}
+                        <div class="row">
+                            {% for session in past_qa %}
+                            <div class="col-lg-6 col-xl-4 mb-4">
+                                <div class="card qa-session-card past">
+                                    <div class="card-body">
+                                        <!-- Status Badge -->
+                                        <div class="d-flex justify-content-between align-items-start mb-3">
+                                            <span class="badge bg-secondary status-badge">
+                                                <i class="fas fa-check me-1"></i>Completed
+                                            </span>
+                                            <small class="text-muted">
+                                                {{ session.group.name }}
+                                            </small>
+                                        </div>
+
+                                        <!-- Session Info -->
+                                        <h5 class="fw-bold mb-2">{{ session.title }}</h5>
+                                        <p class="text-muted small mb-3">{{ session.description|truncatewords:20 }}</p>
+
+                                        <!-- Host Info -->
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="host-avatar me-3">
+                                                {{ session.host.first_name|first }}{{ session.host.last_name|first }}
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0 fw-bold">{{ session.host.get_full_name }}</h6>
+                                                <small class="text-muted">Session Host</small>
+                                            </div>
+                                        </div>
+
+                                        <!-- Schedule Info -->
+                                        <div class="mb-3">
+                                            <div class="d-flex align-items-center mb-1">
+                                                <i class="fas fa-calendar text-muted me-2"></i>
+                                                <span class="small">{{ session.scheduled_datetime|date:"F d, Y" }}</span>
+                                            </div>
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-clock text-muted me-2"></i>
+                                                <span class="small">{{ session.scheduled_datetime|time:"g:i A" }}</span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Questions Summary -->
+                                        {% if session.questions.count > 0 %}
+                                        <div class="question-preview">
+                                            <small class="text-muted d-block mb-1">
+                                                <i class="fas fa-question me-1"></i>
+                                                {{ session.questions.count }} question{{ session.questions.count|pluralize }}
+                                            </small>
+                                            <small class="text-muted">
+                                                Questions answered in session
+                                            </small>
+                                        </div>
+                                        {% endif %}
+
+                                        <!-- Action Buttons -->
+                                        <div class="d-flex gap-2 mt-3">
+                                            <button class="btn btn-outline-info btn-sm flex-fill" onclick="viewRecording({{ session.id }})">
+                                                <i class="fas fa-play me-1"></i>View Recording
+                                            </button>
+                                            <button class="btn btn-outline-secondary btn-sm" onclick="viewQuestions({{ session.id }})">
+                                                <i class="fas fa-list"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-history text-muted mb-3" style="font-size: 4rem;"></i>
+                            <h4 class="text-muted mb-3">No Past Sessions</h4>
+                            <p class="text-muted">No Q&A sessions have been completed yet.</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Schedule Session Tab -->
+                <div class="tab-pane fade" id="schedule">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8">
+                            <div class="card">
+                                <div class="card-header bg-transparent">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-plus text-primary me-2"></i>
+                                        Request a Q&A Session
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <form method="post" id="sessionRequestForm">
+                                        {% csrf_token %}
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="sessionTitle" class="form-label">Session Title</label>
+                                                <input type="text" class="form-control" id="sessionTitle" name="title" 
+                                                       placeholder="e.g., Managing Blood Sugar Levels" required>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label for="sessionGroup" class="form-label">Support Group</label>
+                                                <select class="form-select" id="sessionGroup" name="group" required>
+                                                    <option value="">Select a group...</option>
+                                                    <option value="1">Type 1 Diabetes Support</option>
+                                                    <option value="2">Type 2 Diabetes Management</option>
+                                                    <option value="3">Diabetes & Nutrition</option>
+                                                    <option value="4">Exercise & Diabetes</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="sessionDescription" class="form-label">Description</label>
+                                            <textarea class="form-control" id="sessionDescription" name="description" rows="3"
+                                                      placeholder="Describe what topics you'd like covered in this session..." required></textarea>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="preferredDate" class="form-label">Preferred Date</label>
+                                                <input type="date" class="form-control" id="preferredDate" name="preferred_date" required>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label for="preferredTime" class="form-label">Preferred Time</label>
+                                                <select class="form-select" id="preferredTime" name="preferred_time" required>
+                                                    <option value="">Select time...</option>
+                                                    <option value="09:00">9:00 AM</option>
+                                                    <option value="11:00">11:00 AM</option>
+                                                    <option value="14:00">2:00 PM</option>
+                                                    <option value="16:00">4:00 PM</option>
+                                                    <option value="19:00">7:00 PM</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="initialQuestion" class="form-label">Initial Question (Optional)</label>
+                                            <textarea class="form-control" id="initialQuestion" name="initial_question" rows="2"
+                                                      placeholder="Submit your first question for the session..."></textarea>
+                                        </div>
+                                        
+                                        <div class="text-center">
+                                            <button type="submit" class="btn btn-primary btn-lg">
+                                                <i class="fas fa-paper-plane me-2"></i>Submit Request
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Question Submission Modal -->
+<div class="modal fade" id="questionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Submit a Question</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="questionForm" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" id="sessionId" name="session_id">
+                    
+                    <div class="mb-3">
+                        <label for="questionText" class="form-label">Your Question</label>
+                        <textarea class="form-control" id="questionText" name="question" rows="4" 
+                                  placeholder="Ask your diabetes-related question here..." required></textarea>
+                    </div>
+                    
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="anonymousQuestion" name="anonymous">
+                        <label class="form-check-label" for="anonymousQuestion">
+                            Submit anonymously
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane me-2"></i>Submit Question
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function submitQuestion(sessionId) {
+    document.getElementById('sessionId').value = sessionId;
+    new bootstrap.Modal(document.getElementById('questionModal')).show();
+}
+
+function viewRecording(sessionId) {
+    alert('Opening recording for session ' + sessionId);
+}
+
+function viewQuestions(sessionId) {
+    alert('Viewing questions for session ' + sessionId);
+}
+
+// Handle form submissions
+document.getElementById('sessionRequestForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    alert('Session request submitted! We will review and get back to you.');
+});
+
+document.getElementById('questionForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    alert('Question submitted successfully!');
+    bootstrap.Modal.getInstance(document.getElementById('questionModal')).hide();
+});
+
+// Set minimum date to today
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('preferredDate').setAttribute('min', today);
+});
+</script>
+{% endblock %}

@@ -64,7 +64,7 @@ def schedule(request):
             messages.error(request, f'Error scheduling appointment: {str(e)}')
 
     # Get available providers
-    providers = HealthcareProvider.objects.filter(is_accepting_patients=True).select_related('user')
+    providers = HealthcareProvider.objects.filter(is_available=True).select_related('user')
 
     # Get appointment types
     appointment_types = Appointment.APPOINTMENT_TYPES
@@ -117,6 +117,7 @@ def appointment_list(request):
         appointments_page = []
         upcoming_count = 0
         past_count = 0
+        status_filter = request.GET.get('status', 'all')
         messages.info(request, 'Please complete your profile first.')
 
     return render(request, 'appointments/list.html', {

@@ -1,0 +1,280 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Appointment Details - Telehealth Diabetes Care{% endblock %}
+
+{% block extra_css %}
+<style>
+    .appointment-header {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        color: white;
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    .status-badge {
+        font-size: 1rem;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+    }
+    .info-card {
+        border: none;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        border-radius: 15px;
+    }
+    .message-bubble {
+        max-width: 70%;
+        margin-bottom: 1rem;
+    }
+    .message-bubble.sent {
+        margin-left: auto;
+        background: #007bff;
+        color: white;
+    }
+    .message-bubble.received {
+        background: #f8f9fa;
+        color: #333;
+    }
+    .message-content {
+        padding: 0.75rem 1rem;
+        border-radius: 15px;
+    }
+    .message-time {
+        font-size: 0.75rem;
+        opacity: 0.7;
+        margin-top: 0.25rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <!-- Back Button -->
+            <div class="mb-3">
+                <a href="{% url 'appointments:list' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Appointments
+                </a>
+            </div>
+
+            <!-- Appointment Header -->
+            <div class="appointment-header">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h2 class="fw-bold mb-2">
+                            <i class="fas fa-calendar-check me-2"></i>
+                            Appointment with Dr. {{ appointment.provider.user.get_full_name }}
+                        </h2>
+                        <p class="mb-2">
+                            <i class="fas fa-stethoscope me-2"></i>
+                            {{ appointment.provider.get_specialization_display }}
+                        </p>
+                        <p class="mb-0">
+                            <i class="fas fa-clock me-2"></i>
+                            {{ appointment.scheduled_datetime|date:"F d, Y" }} at {{ appointment.scheduled_datetime|time:"g:i A" }}
+                        </p>
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                        <span class="badge status-badge bg-{% if appointment.status == 'scheduled' %}primary{% elif appointment.status == 'confirmed' %}success{% elif appointment.status == 'completed' %}secondary{% elif appointment.status == 'cancelled' %}danger{% else %}warning{% endif %}">
+                            {{ appointment.get_status_display }}
+                        </span>
+                        <div class="mt-2">
+                            <small>Appointment #{{ appointment.id }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Appointment Details -->
+                <div class="col-lg-8 mb-4">
+                    <div class="card info-card">
+                        <div class="card-header bg-transparent">
+                            <h5 class="mb-0">
+                                <i class="fas fa-info-circle text-primary me-2"></i>
+                                Appointment Details
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <strong>Type:</strong><br>
+                                    <span class="text-muted">{{ appointment.get_appointment_type_display }}</span>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <strong>Duration:</strong><br>
+                                    <span class="text-muted">30 minutes</span>
+                                </div>
+                                {% if appointment.chief_complaint %}
+                                <div class="col-12 mb-3">
+                                    <strong>Chief Complaint:</strong><br>
+                                    <span class="text-muted">{{ appointment.chief_complaint }}</span>
+                                </div>
+                                {% endif %}
+                                {% if appointment.symptoms %}
+                                <div class="col-12 mb-3">
+                                    <strong>Symptoms:</strong><br>
+                                    <span class="text-muted">{{ appointment.symptoms }}</span>
+                                </div>
+                                {% endif %}
+                                {% if appointment.questions %}
+                                <div class="col-12 mb-3">
+                                    <strong>Questions for Provider:</strong><br>
+                                    <span class="text-muted">{{ appointment.questions }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="d-flex gap-2 mt-3">
+                                {% if appointment.status == 'confirmed' and appointment.can_join %}
+                                <a href="{% url 'appointments:join' appointment.id %}" class="btn btn-success">
+                                    <i class="fas fa-video me-2"></i>Join Appointment
+                                </a>
+                                {% elif appointment.status in 'scheduled,confirmed' %}
+                                <a href="{% url 'appointments:reschedule' appointment.id %}" class="btn btn-warning">
+                                    <i class="fas fa-edit me-2"></i>Reschedule
+                                </a>
+                                <form method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to cancel this appointment?')">
+                                    {% csrf_token %}
+                                    <button type="submit" name="cancel_appointment" class="btn btn-outline-danger">
+                                        <i class="fas fa-times me-2"></i>Cancel
+                                    </button>
+                                </form>
+                                {% elif appointment.status == 'completed' %}
+                                <a href="{% url 'appointments:feedback' appointment.id %}" class="btn btn-primary">
+                                    <i class="fas fa-star me-2"></i>Leave Feedback
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Messages Section -->
+                    <div class="card info-card mt-4">
+                        <div class="card-header bg-transparent">
+                            <h5 class="mb-0">
+                                <i class="fas fa-comments text-primary me-2"></i>
+                                Messages
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- Messages Display -->
+                            <div class="messages-container" style="max-height: 400px; overflow-y: auto;">
+                                {% for message in messages %}
+                                <div class="message-bubble {% if message.sender == user %}sent{% else %}received{% endif %}">
+                                    <div class="message-content">
+                                        <div class="message-text">{{ message.message }}</div>
+                                        <div class="message-time">
+                                            {{ message.sent_at|date:"M d, Y g:i A" }}
+                                            {% if message.sender != user %}
+                                            - Dr. {{ message.sender.get_full_name }}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <div class="text-center text-muted py-4">
+                                    <i class="fas fa-comment-slash mb-2" style="font-size: 2rem;"></i>
+                                    <p>No messages yet. Start a conversation with your provider!</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Message Form -->
+                            <form method="post" class="mt-3">
+                                {% csrf_token %}
+                                <div class="input-group">
+                                    <input type="text" name="message" class="form-control" 
+                                           placeholder="Type your message..." required>
+                                    <button type="submit" name="send_message" class="btn btn-primary">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Provider Info Sidebar -->
+                <div class="col-lg-4">
+                    <div class="card info-card">
+                        <div class="card-header bg-transparent">
+                            <h5 class="mb-0">
+                                <i class="fas fa-user-md text-primary me-2"></i>
+                                Provider Information
+                            </h5>
+                        </div>
+                        <div class="card-body text-center">
+                            <div class="avatar-circle bg-primary text-white mx-auto mb-3" style="width: 80px; height: 80px; font-size: 2rem;">
+                                {{ appointment.provider.user.first_name|first }}{{ appointment.provider.user.last_name|first }}
+                            </div>
+                            <h5 class="fw-bold">Dr. {{ appointment.provider.user.get_full_name }}</h5>
+                            <p class="text-muted mb-3">{{ appointment.provider.get_specialization_display }}</p>
+                            
+                            {% if appointment.provider.years_experience %}
+                            <div class="mb-2">
+                                <small class="text-muted">Experience:</small><br>
+                                <span>{{ appointment.provider.years_experience }} years</span>
+                            </div>
+                            {% endif %}
+                            
+                            {% if appointment.provider.license_number %}
+                            <div class="mb-2">
+                                <small class="text-muted">License:</small><br>
+                                <span>{{ appointment.provider.license_number }}</span>
+                            </div>
+                            {% endif %}
+                            
+                            {% if appointment.provider.consultation_fee %}
+                            <div class="mb-3">
+                                <small class="text-muted">Consultation Fee:</small><br>
+                                <span class="fw-bold text-success">${{ appointment.provider.consultation_fee }}</span>
+                            </div>
+                            {% endif %}
+                            
+                            {% if appointment.provider.bio %}
+                            <div class="text-start">
+                                <small class="text-muted">About:</small>
+                                <p class="small mt-1">{{ appointment.provider.bio|truncatewords:30 }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="card info-card mt-4">
+                        <div class="card-header bg-transparent">
+                            <h6 class="mb-0">Quick Actions</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'appointments:schedule' %}" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-plus me-2"></i>Schedule Another
+                                </a>
+                                <a href="{% url 'appointments:list' %}" class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-list me-2"></i>All Appointments
+                                </a>
+                                <a href="{% url 'patients:dashboard' %}" class="btn btn-outline-info btn-sm">
+                                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.avatar-circle {
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+</style>
+{% endblock %}

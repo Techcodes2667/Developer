@@ -21,6 +21,44 @@ import time
 from .forms import OptimizedUserCreationForm, OptimizedAuthenticationForm
 
 @never_cache
+def instant_register(request):
+    """INSTANT registration - minimal validation for development speed"""
+    if request.user.is_authenticated:
+        return redirect('patients:dashboard')
+
+    if request.method == 'POST':
+        username = request.POST.get('username', '').strip()
+        email = request.POST.get('email', '').strip() or f"{username}@test.com"
+
+        if username:
+            try:
+                # Check if user exists
+                if User.objects.filter(username=username).exists():
+                    messages.error(request, 'Username exists.')
+                else:
+                    # INSTANT user creation - minimal data
+                    user = User.objects.create_user(
+                        username=username,
+                        email=email,
+                        password='instant123',  # Default password for speed
+                        first_name=username.title(),
+                    )
+
+                    # Instant login with standard backend
+                    user.backend = 'django.contrib.auth.backends.ModelBackend'
+                    login(request, user)
+
+                    return redirect('patients:dashboard')
+
+            except Exception as e:
+                messages.error(request, 'Registration failed.')
+        else:
+            messages.error(request, 'Username required.')
+
+    return render(request, 'accounts/instant_register.html', {'debug': True})
+
+
+@never_cache
 @csrf_protect
 def register(request):
     """Ultra-fast user registration view"""
@@ -61,7 +99,7 @@ def register(request):
                     user.backend = 'django.contrib.auth.backends.ModelBackend'
                     login(request, user)
 
-                    return redirect('/patients/dashboard/')
+                    return redirect('patients:dashboard')
 
             except Exception as e:
                 messages.error(request, 'Registration failed. Please try again.')
@@ -78,6 +116,46 @@ def register(request):
     return render(request, 'accounts/fast_register.html', context)
 
 @never_cache
+def instant_login(request):
+    """INSTANT login - bypasses all validation for development speed"""
+    if request.user.is_authenticated:
+        return redirect('patients:dashboard')
+
+    if request.method == 'POST':
+        username = request.POST.get('username', '').strip()
+
+        if username:
+            try:
+                # INSTANT LOGIN - no password check in development!
+                user = User.objects.get(username=username, is_active=True)
+
+                # Debug logging
+                print(f"DEBUG: Found user {user.username}, attempting login...")
+
+                # Use standard Django backend for reliability
+                user.backend = 'django.contrib.auth.backends.ModelBackend'
+                login(request, user)
+
+                # Debug logging
+                print(f"DEBUG: Login successful, user authenticated: {request.user.is_authenticated}")
+                print(f"DEBUG: Redirecting to patients:dashboard")
+
+                # Immediate redirect
+                return redirect('patients:dashboard')
+
+            except User.DoesNotExist:
+                print(f"DEBUG: User {username} not found")
+                messages.error(request, 'User not found.')
+            except Exception as e:
+                print(f"DEBUG: Login error: {e}")
+                messages.error(request, 'Login failed.')
+        else:
+            messages.error(request, 'Please enter username.')
+
+    return render(request, 'accounts/instant_login.html', {'debug': True})
+
+
+@never_cache
 @csrf_protect
 def fast_login(request):
     """Ultra-fast login view with minimal processing"""
@@ -89,24 +167,13 @@ def fast_login(request):
         password = request.POST.get('password', '')
 
         if username and password:
-            try:
-                # Direct database lookup for speed - only get necessary fields
-                user = User.objects.only('id', 'username', 'password', 'first_name', 'is_active').get(
-                    username=username, is_active=True
-                )
+            # Use ultra-fast authentication backend
+            user = authenticate(request, username=username, password=password)
 
-                # Quick password check
-                if check_password(password, user.password):
-                    # Manual login without Django's slow authenticate()
-                    user.backend = 'django.contrib.auth.backends.ModelBackend'
-                    login(request, user)
-
-                    # Skip messages for speed - just redirect
-                    next_page = request.GET.get('next', '/patients/dashboard/')
-                    return redirect(next_page)
-                else:
-                    messages.error(request, 'Invalid credentials.')
-            except User.DoesNotExist:
+            if user is not None:
+                login(request, user)
+                return redirect('patients:dashboard')
+            else:
                 messages.error(request, 'Invalid credentials.')
         else:
             messages.error(request, 'Please enter both username and password.')
@@ -262,3 +329,116 @@ def reset_password(request, uidb64, token):
 def login_speed_test(request):
     """Login speed test page"""
     return render(request, 'accounts/login_speed_test.html')
+
+
+def performance_dashboard(request):
+    """Performance dashboard for testing all authentication methods"""
+    return render(request, 'accounts/performance_dashboard.html')
+
+
+def create_test_users(request):
+    """Create test users for development"""
+    from patients.models import PatientProfile
+    from datetime import date
+
+    # Create demo user
+    demo_user, created1 = User.objects.get_or_create(
+        username='demo',
+        defaults={
+            'email': 'demo@test.com',
+            'first_name': 'Demo',
+            'last_name': 'User',
+            'is_active': True,
+        }
+    )
+    if created1:
+        demo_user.set_password('demo123')
+        demo_user.save()
+
+    # Create PatientProfile for demo user
+    demo_profile, profile_created1 = PatientProfile.objects.get_or_create(
+        user=demo_user,
+        defaults={
+            'diabetes_type': 'type2',
+            'date_of_birth': date(1985, 5, 15),
+            'gender': 'M',
+            'phone_number': '+1234567890',
+            'diagnosis_date': date(2020, 3, 10),
+            'hba1c_target': 7.0,
+            'blood_glucose_target_min': 4.0,
+            'blood_glucose_target_max': 10.0,
+        }
+    )
+
+    # Create test patient
+    test_user, created2 = User.objects.get_or_create(
+        username='testpatient',
+        defaults={
+            'email': 'testpatient@test.com',
+            'first_name': 'Test',
+            'last_name': 'Patient',
+            'is_active': True,
+        }
+    )
+    if created2:
+        test_user.set_password('testpass123')
+        test_user.save()
+
+    # Create PatientProfile for test patient
+    test_profile, profile_created2 = PatientProfile.objects.get_or_create(
+        user=test_user,
+        defaults={
+            'diabetes_type': 'type1',
+            'date_of_birth': date(1990, 8, 22),
+            'gender': 'F',
+            'phone_number': '+1987654321',
+            'diagnosis_date': date(2018, 6, 5),
+            'hba1c_target': 6.5,
+            'blood_glucose_target_min': 4.0,
+            'blood_glucose_target_max': 8.0,
+        }
+    )
+
+    # Create admin user
+    admin_user, created3 = User.objects.get_or_create(
+        username='admin',
+        defaults={
+            'email': 'admin@test.com',
+            'first_name': 'Admin',
+            'last_name': 'User',
+            'is_active': True,
+            'is_staff': True,
+            'is_superuser': True,
+        }
+    )
+    if created3:
+        admin_user.set_password('admin123')
+        admin_user.save()
+
+    # Create PatientProfile for admin user (so they can test patient features)
+    admin_profile, profile_created3 = PatientProfile.objects.get_or_create(
+        user=admin_user,
+        defaults={
+            'diabetes_type': 'type2',
+            'date_of_birth': date(1980, 12, 1),
+            'gender': 'O',
+            'phone_number': '+1555000000',
+            'diagnosis_date': date(2019, 1, 15),
+            'hba1c_target': 7.5,
+            'blood_glucose_target_min': 4.5,
+            'blood_glucose_target_max': 9.0,
+        }
+    )
+
+    users_created = sum([created1, created2, created3])
+    profiles_created = sum([profile_created1, profile_created2, profile_created3])
+    total_users = User.objects.count()
+
+    return render(request, 'accounts/test_users_created.html', {
+        'users_created': users_created,
+        'profiles_created': profiles_created,
+        'total_users': total_users,
+        'demo_user': demo_user,
+        'test_user': test_user,
+        'admin_user': admin_user,
+    })

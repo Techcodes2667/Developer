@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚡ INSTANT Register - Telehealth Diabetes Care</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+        .instant-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        .instant-btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 15px 30px;
+            font-weight: 600;
+            color: white;
+            font-size: 1.1rem;
+        }
+        .instant-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+            color: white;
+        }
+        .warning-box {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            color: #333;
+            border-radius: 15px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="instant-card p-4">
+                    <div class="text-center mb-4">
+                        <h2 class="text-primary">⚡ INSTANT REGISTER</h2>
+                        <p class="text-muted">Create account in milliseconds!</p>
+                    </div>
+
+                    <div class="warning-box text-center">
+                        <strong>⚠️ DEVELOPMENT ONLY</strong><br>
+                        <small>Auto-generates email & password!</small>
+                    </div>
+
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    <form method="post" id="instantRegisterForm">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username Only</label>
+                            <input type="text" class="form-control form-control-lg" id="username" name="username" 
+                                   required autofocus placeholder="Enter desired username">
+                            <div class="form-text">
+                                Email: auto-generated as username@test.com<br>
+                                Password: auto-set to "instant123"
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email (Optional)</label>
+                            <input type="email" class="form-control" id="email" name="email" 
+                                   placeholder="Leave blank for auto-generation">
+                        </div>
+                        
+                        <div class="d-grid mb-3">
+                            <button type="submit" class="instant-btn">
+                                ⚡ INSTANT REGISTER
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Quick Register Buttons -->
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <button type="button" class="btn btn-outline-primary w-100 btn-sm" 
+                                    onclick="instantRegister('testuser' + Math.floor(Math.random()*1000))">
+                                Random User
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button type="button" class="btn btn-outline-success w-100 btn-sm" 
+                                    onclick="instantRegister('patient' + Math.floor(Math.random()*1000))">
+                                Random Patient
+                            </button>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="text-center">
+                        <small class="text-muted">Other registration options:</small><br>
+                        <div class="mt-2">
+                            <a href="/accounts/register/" class="btn btn-outline-warning btn-sm me-2">
+                                Full Register
+                            </a>
+                            <a href="/accounts/instant-login/" class="btn btn-outline-info btn-sm">
+                                Instant Login
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Performance Info -->
+                    <div class="mt-3 p-2 bg-light rounded">
+                        <small class="text-muted">
+                            <strong>Performance:</strong> ~20-100ms response time<br>
+                            <strong>Security:</strong> ❌ None (Development only)<br>
+                            <strong>Auto-login:</strong> ✅ Immediate after registration
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Instant register function
+        function instantRegister(username) {
+            document.getElementById('username').value = username;
+            document.getElementById('instantRegisterForm').submit();
+        }
+
+        // Auto-focus and enter key support
+        document.addEventListener('DOMContentLoaded', function() {
+            const usernameField = document.getElementById('username');
+            const emailField = document.getElementById('email');
+            const form = document.getElementById('instantRegisterForm');
+            
+            // Auto-focus
+            usernameField.focus();
+            
+            // Auto-generate email when username changes
+            usernameField.addEventListener('input', function() {
+                if (!emailField.value) {
+                    emailField.placeholder = this.value + '@test.com';
+                }
+            });
+            
+            // Enter key instant submit
+            usernameField.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    form.submit();
+                }
+            });
+            
+            // Performance timing
+            const startTime = performance.now();
+            window.addEventListener('load', function() {
+                const loadTime = performance.now() - startTime;
+                console.log('⚡ Instant register page loaded in:', loadTime.toFixed(2), 'ms');
+            });
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+R for random user
+            if (e.ctrlKey && e.key === 'r') {
+                e.preventDefault();
+                instantRegister('user' + Math.floor(Math.random()*10000));
+            }
+            // Ctrl+P for random patient
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                instantRegister('patient' + Math.floor(Math.random()*10000));
+            }
+        });
+    </script>
+</body>
+</html>

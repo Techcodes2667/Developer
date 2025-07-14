@@ -116,11 +116,14 @@ if DEBUG:
     # NO password validation for development (maximum speed)
     AUTH_PASSWORD_VALIDATORS = []
 
-    # Fast password hashing for development
+    # Ultra-fast password hashing for development
     PASSWORD_HASHERS = [
-        'django.contrib.auth.hashers.MD5PasswordHasher',  # Fastest for development
+        'django.contrib.auth.hashers.MD5PasswordHasher',  # Fastest available
         'django.contrib.auth.hashers.PBKDF2PasswordHasher',
     ]
+
+    # Use standard Django authentication for reliability
+    # Custom backends can cause login loops - keeping it simple
 else:
     # Full validators for production only
     AUTH_PASSWORD_VALIDATORS = [
